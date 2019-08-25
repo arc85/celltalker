@@ -1,24 +1,13 @@
 # celltalker
 
-<!-- badges: start -->
-<!-- badges: end -->
-
-The goal of celltalker is to ...
+The goal of celltalker is to infer putative ligand and receptor interactions from single-cell RNAseq data. Briefly, celltalker seeks to evaluate cell-cell communication based on expression of ligands and receptors within and between clusters of cells across experimental groups.
 
 ## Installation
 
-You can install the released version of celltalker from [CRAN](https://CRAN.R-project.org) with:
+You can install the developmental version of celltalker from github using devtools:
 
 ``` r
-install.packages("celltalker")
-```
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-``` r
+library(devtools)
+install_github("arc85/celltalker")
 library(celltalker)
-## basic example code
 ```
-
