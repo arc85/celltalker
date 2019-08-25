@@ -1,0 +1,381 @@
+---
+title: "celltalker"
+author: "Anthony Cillo"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{celltalker}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+library(knitr)
+hook_output=knit_hooks$get('output')
+knit_hooks$set(output=function(x,options) {
+  if (is.null(n <- options$linewidth)) {
+    x = knitr::split_lines(x)
+    if (any(nchar(x)>n)) x = strwrap(x,width=n)
+    x = paste(x,collapse = '\n')
+  }
+  hook_output(x,options)
+})
+```
+
+# Introduction
+
+Amongst the many types of analysis possible with single-cell RNAseq data is the assessment of putative cell-cell communication. *celltalker* seeks to evaluate cell-cell communication (that is, "talking") by looking for expression of known pairs of ligands and receptors within and between cell populations. Any set of known ligands and receptors can be used; included in this package is the set of ligands and receptors described by the excellent work of Ramilowski et al. We recommend using this dataset as a starting point, and curating your own list of known ligands and receptors.
+
+For the sake of robustness, we assume that there are multiple replicate samples in each group and that we are only interested in only finding consistently expressed ligands and receptors across groups (as opposed to potentially suprious interactions that are only found in one individual replicate). We accomplish this by looking at individual expression matrices for each replicate in a group, and pulling only those interactions that meet a certain threshold.
+
+There are at least three ways in which differences in ligand and receptor interaction could be of biological interest: interactions that are uniquely present in one group versus another; differences in clusters that contribute ligands or receptors between groups; and differences in networks of cells participating in ligand and receptor interactions between groups. We provide methods to assess each of these potential biological differences, and concrete examples of each for clarity.
+
+
+# Vignette overview
+
+This vignette demonstrates a standard use of celltalker on publically available data from 10X Genomics. We will go through the following steps:
+
+- Cluster our data using a standard Seurat workflow (v.2.3.4)
+- Use celltalker to build lists of consistently expressed ligands and receptors within samples groups
+- Determine putative ligand/receptor interactions with a group of samples
+- Evaluate uniquely expressed ligand/receptor pairs between groups
+- Investigate differences in clusters contributing ligands and receptors between groups
+- Interrogate differential networks of cell-cell communication between groups
+
+# Clustering data with Seurat
+
+For this tutorial, we are utilizing two datasets publically available from 10X Genomics. Specifically, we will be using *10k Cells from a Healthy Donor - Gene Expression and Cell Surface Proteins* and *10k Cells from a MALT tumor - Gene Expression and Cell Surface Proteins*. We have downloaded the *Feature / cell matrix (filtered)* from each sample, then unzipped the files and the subdirectories. Finally, we change the name of the *Features.tsv* file to *genes.tsv* so that the Read10X function in this version of Seurat works. The raw data is available here:
+
+https://support.10xgenomics.com/single-cell-gene-expression/datasets
+
+We will first perform a standard analysis using Seurat to create some clusters and evaluate cell-cell communcation. Since we only have one replicate from each sample, we will divide each sample into two fake "biological" replicates (purely for the sake of this vignette!).
+
+```{r,fig.width=7,fig.asp=0.618,out.width="70%",fig.align="center",linewidth=60}
+suppressMessages({
+library(Seurat)
+library(tidyverse)
+library(igraph)
+library(geomnet)
+library(celltalker)
+})
+
+#Create a Seurat object with the raw data, and add sample-specific metadata
+
+raw.data <- Read10X(c("/Users/arc85/Desktop/celltalker_example_data/10k_pbmc/filtered_feature_bc_matrix","/Users/arc85/Desktop/celltalker_example_data/10k_malt/filtered_feature_bc_matrix"))
+
+#Filter out genes expressed with a count less than 1 in 3% of cells
+
+nCountsPerGene <- rowSums(raw.data)
+minReads <- 1*.03*ncol(raw.data)
+genesLeft_minReads <- names(nCountsPerGene)[which(nCountsPerGene > minReads)]
+
+raw.data.filtered <- raw.data[genesLeft_minReads,]
+
+#Create Seurat object and add relevant metadata
+
+ser <- CreateSeuratObject(raw.data.filtered)
+
+data.to.add <- data.frame(matrix(NA,nrow=length(ser@cell.names),ncol=4))
+rownames(data.to.add) <- ser@cell.names
+colnames(data.to.add) <- c("perc.mito","perc.ribo","sample.group","sample.replicate")
+
+mito.genes <- grep("^MT-",rownames(ser@data),value=T)
+perc.mito <- Matrix::colSums(ser@raw.data[mito.genes,])/Matrix::colSums(ser@raw.data)
+
+ribo.genes1 <- grep("^RPS",rownames(ser@data),value=T)
+ribo.genes2 <- grep("^RPL",rownames(ser@data),value=T)
+ribo.genes <- c(ribo.genes1,ribo.genes2)
+perc.ribo <- Matrix::colSums(ser@raw.data[ribo.genes,])/Matrix::colSums(ser@raw.data)
+
+data.to.add[,1] <- perc.mito
+data.to.add[,2] <- perc.ribo
+
+data.to.add[grep("^[ACTG]",ser@cell.names),3] <- "PBMC"
+data.to.add[grep("^2",ser@cell.names),3] <- "MALT"
+
+#Randomize cells from PBMC and MALT to two replicates each
+
+pbmc.group <- data.to.add[data.to.add$sample.group=="PBMC",]
+pbmc.rep1 <- rownames(pbmc.group)[sample(nrow(pbmc.group)/2)]
+pbmc.rep2 <- setdiff(rownames(pbmc.group),pbmc.rep1)
+malt.group <- data.to.add[data.to.add$sample.group=="MALT",]
+malt.rep1 <- rownames(malt.group)[sample(nrow(malt.group)/2)]
+malt.rep2 <- setdiff(rownames(malt.group),malt.rep1)
+
+data.to.add[pbmc.rep1,4] <- "pbmc.rep1"
+data.to.add[pbmc.rep2,4] <- "pbmc.rep2"
+data.to.add[malt.rep1,4] <- "malt.rep1"
+data.to.add[malt.rep2,4] <- "malt.rep2"
+
+#Add metadata to Seurat object
+
+ser <- AddMetaData(ser,metadata=data.to.add)
+
+#Simple Seurat clustering workflow
+
+ser <- NormalizeData(ser)
+ser <- FindVariableGenes(ser,do.plot=FALSE)
+#Remove TotalSeq antibodies from clustering analysis
+ser@var.genes <- ser@var.genes[grep("Total",ser@var.genes,invert=T)]
+ser <- ScaleData(ser,vars.to.regress=c("nGene","perc.mito","perc.ribo"))
+ser <- RunPCA(ser,do.print=FALSE)
+
+PCElbowPlot(ser)
+
+#We will select the first 10 PCs to use
+
+ser <- RunTSNE(ser,dims.use=1:10)
+ser <- FindClusters(ser,dims.use=1:10,res=0.5,print.output=FALSE)
+ser <- BuildClusterTree(ser,do.reorder=TRUE,reorder.numeric=TRUE,do.plot=FALSE,show.progress=FALSE)
+
+```
+
+Now that we have generated our data, let's have a look at it.
+
+```{r,fig.width=7,fig.asp=0.618,linewidth=60}
+
+p1 <- TSNEPlot(ser,group.by="tree.ident",do.label=T,do.return=TRUE)
+p2 <- TSNEPlot(ser,group.by="sample.group",do.return=TRUE)
+p3 <- TSNEPlot(ser,group.by="sample.replicate",do.return=TRUE)
+p1
+plot_grid(p2,p3)
+
+```
+
+Great! Now let's customize our cluster labels by inferring cell types from the TotalSeq antibodies that were inlcuded in this experiment.
+
+```{r,fig.width=7,fig.asp=0.618,fig.align="center",linewidth=60}
+
+total.seq.abs <- grep("Total",rownames(ser@raw.data),value=TRUE)
+total.seq.sub <- total.seq.abs[1:9]
+
+FeaturePlot(ser,features=total.seq.sub)
+
+cell.types <- ser@meta.data$tree.ident
+names(cell.types) <- ser@cell.names
+cell.types[cell.types=="1"] <- "MALT_Tumor_1"
+cell.types[cell.types=="2"] <- "MALT_Tumor_2"
+cell.types[cell.types=="3"] <- "PBMC_CD14_1"
+cell.types[cell.types=="4"] <- "MALT_Tumor_3"
+cell.types[cell.types=="5"] <- "MALT_Tumor_4"
+cell.types[cell.types=="6"] <- "PBMC_B_cell"
+cell.types[cell.types=="7"] <- "PBMC_CD14_2"
+cell.types[cell.types=="8"] <- "PBMC_NK_1"
+cell.types[cell.types=="9"] <- "PBMC_NK_2"
+cell.types[cell.types=="10"] <- "PBMC_CD4_1"
+cell.types[cell.types=="11"] <- "PBMC_CD8_1"
+cell.types[cell.types=="12"] <- "PBMC_CD4_2"
+cell.types[cell.types=="13"] <- "MALT_CD4_1"
+cell.types[cell.types=="14"] <- "MALT_CD8_1"
+cell.types[cell.types=="15"] <- "MALT_CD4_2"
+
+ser <- AddMetaData(ser,metadata=cell.types,col.name="cell.types.clusters")
+
+TSNEPlot(ser,group.by="cell.types.clusters")
+
+```
+
+# celltalker - Consistently expressed ligands and receptors
+
+Now that we have identified and named clusters within our data, we will proceed with the celltalker analysis. The first step is to use the reshape_matrices function to create a tibble with individual matrices for each replicate sample. We use tibbles (and more broadly, the tidyverse) throughout celltalker to make data manipulation more streamlined and to use the hierarchical structure of tibbles as containers for relevant pieces of data.
+
+We need a few key pieces of information from our Seurat analysis, which we define first. Shipped with this packages is the data.frame "ramilowski_pairs", which is a data.frame consisting of ligands, receptors, and putative ligand_receptor pairs. One could potential add or substract to this list (i.e. could filter based only on pairs that have biologically proven interactions, or could add pairs that your lab has shown are relevant).
+
+```{r,linewidth=60}
+
+counts <- ser@raw.data
+defined.clusters <- ser@meta.data$cell.types.clusters
+defined.groups <- ser@meta.data$sample.group
+defined.replicates <- ser@meta.data$sample.replicate
+ramilowski_pairs[1:10,]
+
+reshaped.matrices <- reshape_matrices(count.matrix=counts,clusters=defined.clusters,groups=defined.groups,replicates=defined.replicates,ligands.and.receptors=ramilowski_pairs)
+
+#Check out the hierarchy of the tibble
+reshaped.matrices
+unnest(reshaped.matrices[1,2])
+names(pull(unnest(reshaped.matrices[1,2]))[[1]])
+dim(pull(unnest(reshaped.matrices[1,2]))[[1]][[1]])
+```
+
+What we have done in this initial step is to separate the big expression matrix into a series of individual expression matrices from each patient. An overview of the hierarchy is as follows:
+
+- Tibble with second column containing tibbles of the sample groups
+  - Tibble with the second column containing lists of the expression matrices from each replicate
+    - List of count matrices from each cluster of an individual replicate
+
+Next, we can create a tibble of consistently expressed ligands and receptors for each group using the create_lig_rec_tib function.
+
+```{r,linewidth=60}
+
+consistent.lig.recs <- create_lig_rec_tib(exp.tib=reshaped.matrices,clusters=defined.clusters,groups=defined.groups,replicates=defined.replicates,cells.reqd=10,freq.pos.reqd=0.5,ligands.and.receptors=ramilowski_pairs)
+
+consistent.lig.recs
+pull(consistent.lig.recs[1,2])
+pull(unnest(consistent.lig.recs[1,2])[1,2])
+```
+
+We can see here that we have now recovered a list of consistently expressed ligands and receptors from each cluster in each experimental group, based on the criteria specified above (i.e. at least 5 cells in each cluster express the ligand/receptor and at least 50% of replicates in a group express the ligand/receptor). Functionally, since we only have 2 replicates in each group here, we require all replicate to express the ligand/receptor to count it as consistently expressed (since we only have 2 replicates, requiring 50% of samples to be positive is the same as requiring all samples to be positive).
+
+# Determine putative ligand/receptor pairs
+
+Now that we have consistently expressed ligands and receptors, we will look for interactions (as defined in ramilowski_pairs$pair) within and between clusters in a given group.
+
+```{r,linewidth=60}
+
+interactions <- putative_interactions(ligand.receptor.tibble=consistent.lig.recs,clusters=defined.clusters,groups=defined.groups,freq.group.in.cluster=0.1,ligands.and.receptors=ramilowski_pairs)
+
+interactions
+pull(interactions[2,2])[[1]][11]
+
+```
+
+Here, the nested tibble only contains the sample groups and a list of ligand/receptor pairs for each group along with the clusters that particpate in the ligand/receptor interactions.
+
+# Unique ligand/receptor pairs in a group
+
+Now that we have our lists of ligand/receptor interactions, we can investigate which one are unique to each group. We do this with the unique_interactions function.
+
+```{r,linewidth=60}
+
+unique.int <- unique_interactions(putative.interactions.tib=interactions,group1="MALT",group2="PBMC",ligands.and.receptors=ramilowski_pairs)
+
+unique.int
+unnest(unique.int[1,2])
+unnest(unique.int[2,2])
+
+```
+
+As you can see here, there are a some ligand and receptor interactions that are only expressed in the MALT, as well as some that are only expressed in PBMC. We can create a quick heatmap to visualize these interactions.
+
+```{r,fig.width=7,fig.height=7,fig.align="center",linewidth=60}
+
+#Pull the unique ligands and receptors from the MALT group
+group1.unique <- unnest(unique.int[1,2]) %>% pull()
+group1.lig <- unique(sapply(strsplit(group1.unique,split="_"),function(x) x[[1]]))
+group1.rec <- unique(sapply(strsplit(group1.unique,split="_"),function(x) x[[2]]))
+ligs.recs <- union(group1.lig,group1.rec)
+
+#Pull the expression data, scale, and clip the scaling above and below 2 and -2, respectively
+
+cell.order <- c(ser@cell.names[ser@meta.data$sample.group=="PBMC"],ser@cell.names[ser@meta.data$sample.group=="MALT"])
+mat <- as.matrix(ser@data[ligs.recs,cell.order])
+cols <- c(rep("red",table(ser@meta.data$sample.group)[2]),rep("blue",table(ser@meta.data$sample.group)[1]))
+mat.scaled <- t(apply(mat,1,scale))
+
+for (i in 1:nrow(mat.scaled)) {
+  sub <- mat.scaled[i,]
+  sub[sub>2] <- 2
+  sub[sub< -2] <- -2
+  mat.scaled[i,] <- sub
+}
+
+#Use heatmap3 to generate a heatmap
+
+library(heatmap3)
+
+heatmap3(mat.scaled,scale="none",Colv=NA,ColSideColors=cols,ColSideLab=NA,labCol=NA,cex=1,cexRow=1.5)
+legend("topright",legend=c("PBMC","MALT"),fill=c("red","blue"),ncol=1,bty="n")
+
+```
+
+Here, we can see that there are unique ligand/receptor interactions present in the MALT tumor that are not present in PBMC, and visa versa. One good example is the CXCL13_CXCR5 ligand receptor interaction that is specific to the MALT group. There are also many interactions that are common between the two (236, to be specific). We explore below how these interactions can be uniquely associated with clusters, and how networks of interactions across clusters can shift between sample types.
+
+
+# Differences in clusters expressing ligands/receptors between groups
+
+We can use the function diff_interactions to explore either ligands or receptors that participate in a ligand/receptor interaction and are uniquely expressed in a given cluster. For example, the function below looks for unique ligands that are expressed by the CD8 cells from the MALT group versus the PBMC group.
+
+
+```{r,fig.width=12,fig.asp=0.618,fig.align="center",out.width="70%",linewidth=60}
+
+malt.cd8.diff <- diff_interactions(putative.interactions.tib=interactions,group1="MALT",group2="PBMC",cluster="MALT_CD8_1",search.ligand=TRUE,search.receptor=FALSE,ligands.and.receptors=ramilowski_pairs)
+
+pull(malt.cd8.diff[1,2])[[1]]
+
+#We see that, among many other interctions, IFNG emerged as one that is potentially biologically interesting
+
+grep("IFN",pull(malt.cd8.diff[1,2])[[1]],value=T)
+
+#Let's investigate interferon gamma and it's receptors in more detail - we will make a heatmap showing all the clusters and the expression pattern of IFNG and it's receptors IFNGR1 and IFNGR2
+
+#Pull the log-normalized expression data and scale
+mat <- as.matrix(ser@data[c("IFNG","IFNGR1","IFNGR2"),order(defined.clusters)])
+mat.scaled <- t(apply(mat,1,scale))
+
+for (i in 1:nrow(mat.scaled)) {
+  sub <- mat.scaled[i,]
+  sub[sub>2] <- 2
+  sub[sub< -2] <- -2
+  mat.scaled[i,] <- sub
+}
+
+#Use RColorBrewer to assign unique colors to each cluster
+library(RColorBrewer)
+col.length <- length(unique(defined.clusters))
+color.function <- colorRampPalette(brewer.pal(7,"Set1"))
+cols <- color.function(15)
+
+cols.heat <- as.factor(defined.clusters)
+cols.heat <- as.character(recode(cols.heat,!!! setNames(cols,levels(cols.heat))))
+cols.heat <- cols.heat[order(defined.clusters)]
+
+#Plot the heatmap and legend
+heatmap3(mat.scaled,scale="none",Colv=NA,ColSideColors=cols.heat,ColSideLab=NA,labCol=NA,,cex=1,cexRow=1.5)
+legend("topright",legend=levels(defined.clusters),fill=cols,ncol=1,bty="n")
+
+```
+
+We can see that the MALT_CD8_1 cluster is a significant IFNG expressing cluster, and that other clusters within the MALT groups express the receptors IFNGR1 and IFNGR2. While the receptors are expressed in PBMC groups, the IFNG expression is infrequent and therefore doesn't score as an interaction.
+
+# Differences in networks between groups
+
+A final way that we will explore how interactions could differ by groups is by investigating shifts in networks of cell-cell communication. Formally, we can use graph theory to build sets of edges and nodes for all instances of specific ligand/receptor interactions within a group. We can then use these graphs to compare differences in the networks. This is facilitated through the diff_network function, which uses the igraph package for the network inference and some simple visualizations.
+
+```{r,fig.width=7,fig.asp=0.618,fig.align="center",linewidth=60}
+
+#Pull the interactions that are common between the groups. We will look at the interaction between BTLA and TNFRSF14 as an example
+common.int <- unnest(unique.int[3,2]) %>% pull()
+common.int[33]
+btla4.tnfrsf14.diff <- diff_network(putative.interactions.tib=interactions,group1="MALT",group2="PBMC",interaction="BTLA_TNFRSF14")
+
+#Check out the tibble formed by the diff_network function
+btla4.tnfrsf14.diff
+
+#We can directly plot graphs of the differences in networks using the base R plot function on the first two rows of the tibble
+par(mfrow=c(1,2))
+plot(pull(btla4.tnfrsf14.diff[1,2])[[1]],main="MALT vs PBMC Differences")
+plot(pull(btla4.tnfrsf14.diff[2,2])[[1]],main="PBMC vs MALT Differences")
+
+#We can also view the differences in edges as a matrix using the last 2 rows of the tibble
+pull(btla4.tnfrsf14.diff[3,2])[[1]]
+```
+
+We can beautify these network plots using geomnet (an add-on to ggplot2 for network plotting).
+
+```{r,fig.width=7,fig.height=7,fig.align="center",linewidth=60}
+
+diff.edges <- data.frame(pull(btla4.tnfrsf14.diff[3,2])[[1]])
+diff.edges[] <- lapply(diff.edges,as.character)
+
+#We need to have all of the unique edges listed in column 1 (even if they don't have intereactions) for geomenet to work properly - so we add them
+diff.edges.diff <- setdiff(diff.edges[,2],diff.edges[,1])
+for (i in 1:length(diff.edges.diff)) {
+	diff.edges[nrow(diff.edges)+1,1] <- diff.edges.diff[i]
+	diff.edges[nrow(diff.edges),2] <- NA
+}
+
+#Create pull colors to use from our last heatmap
+net.cols <- levels(as.factor(cols.heat))
+names(net.cols) <- levels(diff.edges[,1])
+
+ggplot(data=diff.edges,aes(from_id=group1,to_id=group2)) +
+  geom_net(aes(colour=group1),labelon=FALSE,directed=TRUE,vjust=0.5,size=15,arrowsize=1,linewidth=0.5,arrowgap=0.1,selfloops=TRUE,ecolour="grey40") +
+  theme_net() +
+  theme(legend.position="bottom",legend.title=element_blank()) +
+  scale_colour_manual(values=net.cols)
+
+```
+
+# Summary
+celltalker allows a user to infer ligand/receptor interactions beginning with a count matrix and metadata associated with the experiment. We interrogate 3 different ways that ligand/receptor interactions can differ between sample groups, and provide some examples of visualizing these differences. Have fun investigating how your cells talk to each other!
