@@ -4,7 +4,7 @@ The goal of celltalker is to infer putative ligand and receptor interactions fro
 
 ## Installation
 
-You can install the developmental version of celltalker from github using devtools:
+You can install the development version of celltalker from github using devtools:
 
 ``` r
 library(devtools)
