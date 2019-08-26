@@ -11,3 +11,7 @@ library(devtools)
 install_github("arc85/celltalker")
 library(celltalker)
 ```
+
+## Additional information
+
+For more information and the celltalker vignette, check out the celltalker website <https://arc85.github.io/celltalker/>.
