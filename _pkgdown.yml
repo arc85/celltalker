@@ -1,0 +1,36 @@
+navbar:
+  structure:
+    left:
+    - home
+    - intro
+    - reference
+    - articles
+    - tutorials
+    - news
+    right: github
+  components:
+    home:
+      icon: fa-home fa-lg
+      href: index.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    intro:
+      text: Get started
+      href: articles/celltalker.html
+
+reference:
+  - title: Exported functions
+    desc: celltalker has the following functions to facilitate interrogation of cell-cell communication
+    contents:
+    - create_lig_rec_tib
+    - diff_interactions
+    - diff_network
+    - putative_interactions
+    - reshape_matrices
+    - unique_interactions
+
+articles:
+- title: All vignettes
+  desc: ~
+  contents: '`celltalker`'
