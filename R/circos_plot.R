@@ -63,7 +63,8 @@ circos_plot <- function(interactions1,interactions2=NULL,clusters,ligand.col="#C
     }
     names(shared.int) <- shared.names
 
-    group1.uni <- setdiff(names(interactions.list[[1]])[group1.pos],names(interactions.list[[2]])[group2.pos])
+    group1.uni.names <- setdiff(names(interactions.list[[1]])[group1.pos],names(interactions.list[[2]])[group2.pos])
+    group1.uni <- interactions.list[[1]][group1.uni.names]
 
     ligands <- unique(sapply(strsplit(all.int,split="_"),`[[`,1))
 
@@ -134,6 +135,40 @@ if (length(interactions.list)==1) {
   print("Plotted interactions")
 } else {
   print("Plotted shared interactions")
+}
+
+if (length(interactions.list)>1) {
+
+#Draw links - unique
+
+for (i in 1:length(names(group1.uni))) {
+  link <- names(group1.uni)[i]
+
+  lig.link <- sapply(strsplit(link,split="_"),`[[`,1)
+  rec.link <- sapply(strsplit(link,split="_"),`[[`,2)
+
+  link.1 <- group1.uni[[i]][["ligand.cells"]]
+  link.2 <- group1.uni[[i]][["receptor.cells"]]
+
+  for (a in 1:length(link.1)) {
+
+  circos.sub1 <- subset(circos.data,cell.type==link.1[a])
+
+    for (z in 1:length(link.2)) {
+
+      circos.sub2 <- subset(circos.data,cell.type==link.2[z])
+
+      ref.num1 <- circos.sub1$ref.num[which(circos.sub1$gene==lig.link)]
+      ref.num2 <- circos.sub2$ref.num[which(circos.sub2$gene==rec.link)]
+
+      circos.link(link.1[a],ref.num1,link.2[z],ref.num2,col=unique.vs.control.interactions.col,h.ratio=0.2)
+  }
+
+}
+}
+
+print("Plotted unique interactions")
+
 }
 
 }
