@@ -12,10 +12,10 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends:
-    R (>= 3.4.0)
-Imports:
-    igraph (>= 1.2.0),
+    R (>= 3.4.0),
     tidyverse (>= 1.1.0)
+Imports:
+    igraph (>= 1.2.0)
 Suggests:
     geomnet (>= 0.2.0),
     ggplot2 (>= 3.2.0),
