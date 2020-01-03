@@ -1,6 +1,6 @@
 Package: celltalker
 Title: Analysis of cell-cell communication from single-cell RNAseq data
-Version: 0.0.1.9000
+Version: 0.0.2.9000
 Authors@R:
     person(given = "Anthony",
            family = "Cillo",
