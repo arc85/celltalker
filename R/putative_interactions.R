@@ -46,9 +46,15 @@ names(rec.list) <- group.unnest$cluster.id
 
 for (a in 1:length(rec.list)) {
 
+	if (is.null(rec.list[[a]])) {
+
+	} else {
+
 expanded <- expand.grid(cell.ligs,rec.list[[a]])
 expanded$pair <- paste(expanded[,1],expanded[,2],sep="_")
 interactions <- expanded$pair[expanded$pair %in% ramilowski_pairs$pair]
+
+}
 
 if (length(interactions)==0) {
 
