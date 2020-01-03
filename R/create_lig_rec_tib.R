@@ -53,6 +53,13 @@ for (z in 1:length(levels(clusters))) {
 
 		genes.pos <- lapply(cluster.pos,function(x) apply(x,2,function(y) sum(y>0)>freq.pos.reqd))
 		genes.pos.vec <- Reduce(rbind,genes.pos)
+
+		if (is.null(dim(genes.pos.vec))) {
+			if (1/nrow(pid.layer)>freq.pos.reqd) {
+			genes.to.include <- names(genes.pos.vec)[genes.pos.vec]
+		} else {lig.rec.res[[z]] <- list(ligands=NA,receptors=NA)}
+		} else {
+
 		genes.to.include <- apply(genes.pos.vec,2,function(x) sum(x)/nrow(pid.layer)>freq.pos.reqd)
 		genes.to.include <- names(genes.to.include)[genes.to.include]
 
@@ -61,6 +68,7 @@ for (z in 1:length(levels(clusters))) {
 
 		lig.rec.res[[z]] <- list(ligands=ligands,receptors=receptors)
 
+		}
 
 	}
 
