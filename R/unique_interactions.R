@@ -13,8 +13,8 @@
 
 unique_interactions <- function(putative.interactions.tib,group1,group2,ligands.and.receptors) {
 
-group1.exp <- unnest(putative.interactions.tib[putative.interactions.tib$name %in% group1,2]) %>% pull()
-group2.exp <- unnest(putative.interactions.tib[putative.interactions.tib$name %in% group2,2]) %>% pull()
+group1.exp <- unnest(putative.interactions.tib[putative.interactions.tib$group %in% group1,2]) %>% pull()
+group2.exp <- unnest(putative.interactions.tib[putative.interactions.tib$group %in% group2,2]) %>% pull()
 names(group1.exp) <- names(group2.exp) <- ligands.and.receptors$pair
 
 non.null1 <- group1.exp[sapply(group1.exp,function(x) !any(is.null(x[[1]])))]

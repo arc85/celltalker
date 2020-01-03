@@ -31,7 +31,7 @@ reshape_matrices <- function(count.matrix,clusters,groups,replicates,ligands.and
 	#Create nested data.frames by splitting and combining
 	sp.rep.id <- mat.tib %>% split(.$replicate.id)
 	sp.clust.id <- sp.rep.id %>% map(~.x %>% split(.$cluster.id))
-	sp.clust.id.nest <- enframe(sp.clust.id,'sample')
+	sp.clust.id.nest <- enframe(sp.clust.id,name="sample",value="expr.matrices")
 
 	ref.table <- table(groups,replicates)
 
@@ -50,6 +50,6 @@ reshape_matrices <- function(count.matrix,clusters,groups,replicates,ligands.and
 	}
 	names(listing) <- names(groups.list)
 
-	groups.samples.nested <- enframe(listing)
+	groups.samples.nested <- enframe(listing,name="group",value="samples")
 
 }
