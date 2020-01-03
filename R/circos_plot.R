@@ -38,7 +38,6 @@ circos_plot <- function(interactions1,interactions2=NULL,clusters,ligand.col="#C
 	shared.int <- interactions.list[[1]][non.neg.int]
 
   ligands <- unique(sapply(strsplit(names(shared.int),split="_"),`[[`,1))
-
   receptors <- unique(sapply(strsplit(names(shared.int),split="_"),`[[`,2))
 
   } else {
@@ -122,8 +121,8 @@ circos_plot <- function(interactions1,interactions2=NULL,clusters,ligand.col="#C
 
 				circos.sub2 <- subset(circos.data,cell.type==link.2[z])
 
-				ref.num1 <- circos.sub1$ref.num[which(circos.sub1$gene==lig.link)]
-				ref.num2 <- circos.sub2$ref.num[which(circos.sub2$gene==rec.link)]
+				ref.num1 <- circos.sub1$ref.num[which(circos.sub1$genes==lig.link)]
+				ref.num2 <- circos.sub2$ref.num[which(circos.sub2$genes==rec.link)]
 
 				circos.link(link.1[a],ref.num1,link.2[z],ref.num2,col=interactions.col,h.ratio=0.2)
 		}
