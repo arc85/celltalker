@@ -78,6 +78,6 @@ replicate.tab[[a]] <- tibble(cluster.id=levels(clusters),ligands.and.receptors=l
 
 }
 
-lig.rec.tab <- enframe(replicate.tab)
+lig.rec.tab <- enframe(replicate.tab,name="group",value="lig.rec.exp")
 
 }
