@@ -46,7 +46,9 @@ names(rec.list) <- group.unnest$cluster.id
 
 for (a in 1:length(rec.list)) {
 
-	if (is.null(rec.list[[a]])) {
+	interactions <- NULL
+
+	if (any(is.null(rec.list[[a]]),is.na(rec.list[[a]]))) {
 
 	} else {
 
