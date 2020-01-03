@@ -77,6 +77,6 @@ group.list[[q]] <- interactions.list
 
 }
 
-group.tab <- enframe(group.list)
+group.tab <- enframe(group.list,name="group",value="lig_rec_list")
 
 }
