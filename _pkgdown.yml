@@ -23,12 +23,11 @@ reference:
   - title: Exported functions
     desc: celltalker has the following functions to facilitate interrogation of cell-cell communication
     contents:
-    - create_lig_rec_tib
-    - diff_interactions
-    - diff_network
-    - putative_interactions
     - reshape_matrices
+    - create_lig_rec_tib
+    - putative_interactions
     - unique_interactions
+    - circos_plot
 
 articles:
 - title: All vignettes
