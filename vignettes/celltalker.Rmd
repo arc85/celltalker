@@ -22,6 +22,10 @@ knit_hooks$set(output=function(x,options) {
 })
 ```
 
+```{r,include=FALSE}
+  path.to.working <- "/zfs1/tbruno/arc85/celltalker_vignette.20.01.02"
+```
+
 # Introduction
 
 Amongst the many types of analysis possible with single-cell RNAseq data is the assessment of putative cell-cell communication. *celltalker* seeks to evaluate cell-cell communication (that is, "talking") by looking for expression of known pairs of ligands and receptors within and between cell populations. Any set of known ligands and receptors can be used; included in this package is the set of ligands and receptors described by the excellent work of Ramilowski et al (Nature Communications, 2015). We recommend using this list of ligands and receptors as a starting point, and either curating your own list of known ligands and receptors. Alternatively, work by Vento-Tormo et al (Nature, 2018) has recently extensively curated ligands and receptors, and will be implemented in future versions of cellTalker.
@@ -39,7 +43,7 @@ This vignette demonstrates a standard use of celltalker on publically available 
 - Use celltalker to build lists of consistently expressed ligands and receptors within samples groups
 - Determine putative ligand/receptor interactions with a groups
 - Evaluate uniquely expressed ligand/receptor pairs between groups
-- Create circos plots of unique ligands/receptor interactions within each group
+- Identifying and visualizing unique ligand/receptor pairs in a group
 
 
 # Clustering data with Seurat
@@ -58,7 +62,6 @@ set.seed(02221989)
 
 #Read in raw data
 
-path.to.working <- getwd()
 setwd("data_matrices")
 data.paths <- list.files()
 specific.paths <- paste(path.to.working,"data_matrices",data.paths,"GRCh38",sep="/")
@@ -104,13 +107,13 @@ ser.obj <- FindClusters(ser.obj,resolution=0.5)
 
 Let's have a look at our data.
 
-```{r,fig.width=7,fig.asp=0.618,linewidth=60}
+```{r,fig.width=7,fig.asp=0.618,fig.align="center",linewidth=60}
 
 p1 <- DimPlot(ser.obj,reduction="umap",group.by="sample.id")
 p2 <- DimPlot(ser.obj,reduction="umap",group.by="sample.type")
-p3 <- DimPlot(ser.obj,reduction="umap",group.by="RNA_snn_res.0.5",label=T)
+p3 <- DimPlot(ser.obj,reduction="umap",group.by="RNA_snn_res.0.5",label=T) + NoLegend()
 
-cowplot::plot_grid(p1,p2,p3,nrow=2)
+cowplot::plot_grid(p1,p2,p3)
 
 ```
 
@@ -218,9 +221,9 @@ names(pull(unnest(reshaped.matrices,cols="samples"))[[1]])
 
 What we have done in this initial step is to separate our overall expression matrix into a series of individual expression matrices from each sample. An overview of the resulting tibble is as follows:
 
-- 2-column tibble containing group and samples
-  -  "samples" column from the top-level contains 3-column tibble
-    - "expr.matrices" from above is a list of count matrices from each cluster of an individual replicate (in this case, clusters are the cell types)
+2-column tibble containing group and samples
+-  "samples" column from the top-level contains 3-column tibble
+  - "expr.matrices" from above is a list of count matrices from each cluster of an individual replicate (in this case, clusters are the cell types)
 
 Next, we can create a tibble of consistently expressed ligands and receptors for each group using the create_lig_rec_tib function.
 
@@ -229,8 +232,8 @@ Next, we can create a tibble of consistently expressed ligands and receptors for
 consistent.lig.recs <- create_lig_rec_tib(exp.tib=reshaped.matrices,clusters=defined.clusters,groups=defined.groups,replicates=defined.replicates,cells.reqd=10,freq.pos.reqd=0.5,ligands.and.receptors=interact.for)
 
 consistent.lig.recs
-pull(consistent.lig.recs[1,2])[[1]]
-pull(unnest(consistent.lig.recs[1,2])[1,2])[[1]]
+unnest(consistent.lig.recs[1,2],cols="lig.rec.exp")
+pull(unnest(consistent.lig.recs[1,2],cols="lig.rec.exp")[1,2])[[1]]
 ```
 
 We can see that we have now recovered a list of consistently expressed ligands and receptors from each cluster in each experimental group, based on the criteria specified above (i.e. at least 10 cells in each cluster express the ligand/receptor and at least 50% of replicates in a group express the ligand/receptor). Functionally, since we only have 2 replicates in each group here, we require all replicate to express the ligand/receptor to count it as consistently expressed.
@@ -243,30 +246,30 @@ Now that we have consistently expressed ligands and receptors, we will look for 
 
 put.int <- putative_interactions(ligand.receptor.tibble=consistent.lig.recs,clusters=defined.clusters,groups=defined.groups,freq.group.in.cluster=0.05,ligands.and.receptors=interact.for)
 
-put.int
-unnest()
-pull(unnest())
-
 ```
 
 Here, the nested tibble contains the sample groups and a list of ligand/receptor pairs for each group along with the clusters that particpate in the ligand/receptor interactions.
 
-# Identifying and visualizing ligand/receptor pairs in a group
+# Identifying and visualizing unique ligand/receptor pairs in a group
 
 Now that we have our lists of ligand/receptor interactions, we can investigate which one are unique to each group (using the unique_interactions function) and plot the results (using the circos_plot function) to visualize the differences between groups.
 
-```{r,fig.width=7,fig.asp=0.618,fig.align="center",linewidth=60}
+```{r,fig.width=10,fig.asp=0.618,fig.align="center",linewidth=60}
 
-unique.tonsil <- unique_interactions(put.int,group1="tonsil",group2="pbmc",interact.for)
+#Identify unique ligand/receptor interactions present in each sample
+unique.ints <- unique_interactions(put.int,group1="pbmc",group2="tonsil",interact.for)
 
-for.circos <- put.int.sub[pull(unique.tonsil[1,2])[[1]]]
+#Get data to plot circos for PBMC
+pbmc.to.plot <- pull(unique.ints[1,2])[[1]]
+for.circos.pbmc <- pull(put.int[1,2])[[1]][pbmc.to.plot]
 
-circos_plot(interactions=for.circos,clusters=defined.clusters)
+circos_plot(interactions=for.circos.pbmc,clusters=defined.clusters)
 
-put.int.sub <- pull(put.int[1,2])[[1]]
-for.circos2 <- put.int.sub[pull(unique.tonsil[2,2])[[1]]]
+#Get data to plot circos for tonsil
+tonsil.to.plot <- pull(unique.ints[2,2])[[1]]
+for.circos.tonsil <- pull(put.int[2,2])[[1]][tonsil.to.plot]
 
-circos_plot(interactions=for.circos2,clusters=defined.clusters)
+circos_plot(interactions=for.circos.tonsil,clusters=defined.clusters)
 
 ```
 
