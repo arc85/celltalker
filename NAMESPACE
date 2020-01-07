@@ -2,8 +2,6 @@
 
 export(circos_plot)
 export(create_lig_rec_tib)
-export(diff_interactions)
-export(diff_network)
 export(putative_interactions)
 export(reshape_matrices)
 export(unique_interactions)
