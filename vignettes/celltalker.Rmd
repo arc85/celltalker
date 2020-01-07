@@ -237,13 +237,25 @@ We can see that we have now recovered a list of consistently expressed ligands a
 
 # Determine putative ligand/receptor pairs
 
-Now that we have consistently expressed ligands and receptors, we will look for interactions (as defined in ramilowski_pairs$pair) within and between clusters in a given group.
+Now that we have consistently expressed ligands and receptors, we will look for interactions (as defined in ramilowski_pairs$pair) within and between clusters in a given group. The parameter "freq.group.in.cluster" allows us to only examine clusters that consist of (in this case) >5% of cells from a given group for interactions.
 
 ```{r,linewidth=60}
 
 put.int <- putative_interactions(ligand.receptor.tibble=consistent.lig.recs,clusters=defined.clusters,groups=defined.groups,freq.group.in.cluster=0.05,ligands.and.receptors=interact.for)
 
 put.int
+unnest()
+pull(unnest())
+
+```
+
+Here, the nested tibble contains the sample groups and a list of ligand/receptor pairs for each group along with the clusters that particpate in the ligand/receptor interactions.
+
+# Identifying and visualizing ligand/receptor pairs in a group
+
+Now that we have our lists of ligand/receptor interactions, we can investigate which one are unique to each group (using the unique_interactions function) and plot the results (using the circos_plot function) to visualize the differences between groups.
+
+```{r,fig.width=7,fig.asp=0.618,fig.align="center",linewidth=60}
 
 unique.tonsil <- unique_interactions(put.int,group1="tonsil",group2="pbmc",interact.for)
 
@@ -258,21 +270,5 @@ circos_plot(interactions=for.circos2,clusters=defined.clusters)
 
 ```
 
-Here, the nested tibble only contains the sample groups and a list of ligand/receptor pairs for each group along with the clusters that particpate in the ligand/receptor interactions.
-
-# Unique ligand/receptor pairs in a group
-
-Now that we have our lists of ligand/receptor interactions, we can investigate which one are unique to each group. We do this with the unique_interactions function.
-
-```{r,linewidth=60}
-
-unique.int <- unique_interactions(putative.interactions.tib=interactions,group1="MALT",group2="PBMC",ligands.and.receptors=ramilowski_pairs)
-
-unique.int
-unnest(unique.int[1,2])
-unnest(unique.int[2,2])
-
-```
-
 # Summary
-celltalker allows a user to infer ligand/receptor interactions beginning with a count matrix and metadata associated with the experiment. We interrogate 3 different ways that ligand/receptor interactions can differ between sample groups, and provide some examples of visualizing these differences. Have fun investigating how your cells talk to each other!
+celltalker allows a user to infer ligand/receptor interactions. This vignette has walked through how to identify and visualize unique interactions, staring with raw count data and metadata. Future developments will focus on differential networks of cell-cell communication for given ligand/receptor pairs. Stay tuned for future updates. Until then, have fun investigating how your cells "talk" to each other!
