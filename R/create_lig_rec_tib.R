@@ -22,7 +22,7 @@ names(replicate.tab) <- levels(as.factor(groups))
 
 for (a in 1:length(levels(as.factor(groups)))) {
 
-pid.layer <- unnest(exp.tib[a,2])
+pid.layer <- unnest(exp.tib[a,2],cols="samples")
 pid.cell.num <- vector("list",length=nrow(pid.layer))
 
 lig.rec.res <- vector("list",length=length(levels(clusters)))
@@ -31,7 +31,7 @@ names(lig.rec.res) <- levels(clusters)
 for (z in 1:length(levels(clusters))) {
 
 	for (i in 1:nrow(pid.layer)) {
-		pid.cell.num[[i]] <- Reduce(rbind,unnest(pid.layer[i,2]) %>% transmute(n.rows=map(expr.matrices,nrow)) %>% pull(n.rows))
+		pid.cell.num[[i]] <- Reduce(rbind,unnest(pid.layer[i,2],cols="expr.matrices") %>% transmute(n.rows=map(expr.matrices,nrow)) %>% pull(n.rows))
 	}
 
 	n.cells.cluster <- Reduce(rbind,lapply(pid.cell.num,function(x) x[z,]))
