@@ -23,7 +23,7 @@ knit_hooks$set(output=function(x,options) {
 ```
 
 ```{r,include=FALSE}
-  path.to.working <- "/Users/arc85/Desktop/celltalker_vignette.20.01.02/"
+  path.to.working <- "/Users/arc85/Desktop/celltalker_vignette.20.01.02"
 ```
 
 # Introduction
