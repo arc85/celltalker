@@ -7,8 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>celltalker • celltalker</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="celltalker">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
@@ -30,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">celltalker</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3.9000</span>
       </span>
     </div>
 
@@ -61,13 +62,14 @@
 <!--/.navbar -->
 
       
-      </header><div class="row">
+
+      </header><script src="celltalker_files/jquery-1.11.3/jquery.min.js"></script><script src="celltalker_files/elevate-section-attrs-2.0/elevate-section-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>celltalker</h1>
                         <h4 class="author">Anthony Cillo</h4>
             
-            <h4 class="date">2019-08-25</h4>
+            <h4 class="date">2020-01-08</h4>
       
       
       <div class="hidden name"><code>celltalker.Rmd</code></div>
@@ -79,587 +81,389 @@
 <div id="introduction" class="section level1">
 <h1 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h1>
-<p>Amongst the many types of analysis possible with single-cell RNAseq data is the assessment of putative cell-cell communication. <em>celltalker</em> seeks to evaluate cell-cell communication (that is, “talking”) by looking for expression of known pairs of ligands and receptors within and between cell populations. Any set of known ligands and receptors can be used; included in this package is the set of ligands and receptors described by the excellent work of Ramilowski et al. We recommend using this dataset as a starting point, and curating your own list of known ligands and receptors.</p>
-<p>For the sake of robustness, we assume that there are multiple replicate samples in each group and that we are only interested in only finding consistently expressed ligands and receptors across groups (as opposed to potentially suprious interactions that are only found in one individual replicate). We accomplish this by looking at individual expression matrices for each replicate in a group, and pulling only those interactions that meet a certain threshold.</p>
-<p>There are at least three ways in which differences in ligand and receptor interaction could be of biological interest: interactions that are uniquely present in one group versus another; differences in clusters that contribute ligands or receptors between groups; and differences in networks of cells participating in ligand and receptor interactions between groups. We provide methods to assess each of these potential biological differences, and concrete examples of each for clarity.</p>
+<p>Amongst the many types of analysis possible with single-cell RNAseq data is the assessment of putative cell-cell communication. <em>celltalker</em> seeks to evaluate cell-cell communication (that is, “talking”) by looking for expression of known pairs of ligands and receptors within and between cell populations. Any set of known ligands and receptors can be used; included in this package is the set of ligands and receptors described by the excellent work of Ramilowski et al (Nature Communications, 2015). We recommend using this list of ligands and receptors as a starting point, and either curating your own list of known ligands and receptors. Alternatively, work by Vento-Tormo et al (Nature, 2018) has recently extensively curated ligands and receptors, and will be implemented in future versions of cellTalker.</p>
+<p>For the sake of robustness, we assume that there are multiple replicate samples in each group and that we are only interested in only finding consistently expressed ligands and receptors across groups (as opposed to potentially suprious interactions that are only found in one individual replicate). We accomplish this by looking at individual expression matrices for each individual sample in a group, and pulling only those interactions that meet a given (arbitrary) threshold.</p>
+<p>In this vignette, we demonstrate a basic use of cellTalker to evaluate putative ligand/receptor interactions in peripheral blood (N=2) and tonsils from healthy donors (N=3). This data is publically available from our recently published dataset (Cillo et al, Immunity 2020) on the NCBI Gene Expression Omnibus Series GSE139324.</p>
 </div>
 <div id="vignette-overview" class="section level1">
 <h1 class="hasAnchor">
 <a href="#vignette-overview" class="anchor"></a>Vignette overview</h1>
 <p>This vignette demonstrates a standard use of celltalker on publically available data from 10X Genomics. We will go through the following steps:</p>
 <ul>
-<li>Cluster our data using a standard Seurat workflow (v.2.3.4)</li>
+<li>Cluster our data using a standard Seurat workflow (v.3.1.1)</li>
 <li>Use celltalker to build lists of consistently expressed ligands and receptors within samples groups</li>
-<li>Determine putative ligand/receptor interactions with a group of samples</li>
+<li>Determine putative ligand/receptor interactions with a groups</li>
 <li>Evaluate uniquely expressed ligand/receptor pairs between groups</li>
-<li>Investigate differences in clusters contributing ligands and receptors between groups</li>
-<li>Interrogate differential networks of cell-cell communication between groups</li>
+<li>Identifying and visualizing unique ligand/receptor pairs in a group</li>
 </ul>
 </div>
 <div id="clustering-data-with-seurat" class="section level1">
 <h1 class="hasAnchor">
 <a href="#clustering-data-with-seurat" class="anchor"></a>Clustering data with Seurat</h1>
-<p>For this tutorial, we are utilizing two datasets publically available from 10X Genomics. Specifically, we will be using <em>10k Cells from a Healthy Donor - Gene Expression and Cell Surface Proteins</em> and <em>10k Cells from a MALT tumor - Gene Expression and Cell Surface Proteins</em>. We have downloaded the <em>Feature / cell matrix (filtered)</em> from each sample, then unzipped the files and the subdirectories. Finally, we change the name of the <em>Features.tsv</em> file to <em>genes.tsv</em> so that the Read10X function in this version of Seurat works. The raw data is available here:</p>
-<p><a href="https://support.10xgenomics.com/single-cell-gene-expression/datasets" class="uri">https://support.10xgenomics.com/single-cell-gene-expression/datasets</a></p>
-<p>We will first perform a standard analysis using Seurat to create some clusters and evaluate cell-cell communcation. Since we only have one replicate from each sample, we will divide each sample into two fake “biological” replicates (purely for the sake of this vignette!).</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressMessages</a></span>({</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(Seurat)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tidyverse)</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(igraph)</a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(geomnet)</a>
-<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(celltalker)</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7">})</a>
-<a class="sourceLine" id="cb1-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co">#Create a Seurat object with the raw data, and add sample-specific metadata</span></a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb1-11" data-line-number="11">raw.data &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/Read10X">Read10X</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"/Users/arc85/Desktop/celltalker_example_data/10k_pbmc/filtered_feature_bc_matrix"</span>,<span class="st">"/Users/arc85/Desktop/celltalker_example_data/10k_malt/filtered_feature_bc_matrix"</span>))</a>
-<a class="sourceLine" id="cb1-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co">#Filter out genes expressed with a count less than 1 in 3% of cells</span></a>
-<a class="sourceLine" id="cb1-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb1-15" data-line-number="15">nCountsPerGene &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colSums">rowSums</a></span>(raw.data)</a>
-<a class="sourceLine" id="cb1-16" data-line-number="16">minReads &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">*</span>.<span class="dv">03</span><span class="op">*</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">ncol</a></span>(raw.data)</a>
-<a class="sourceLine" id="cb1-17" data-line-number="17">genesLeft_minReads &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(nCountsPerGene)[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(nCountsPerGene <span class="op">&gt;</span><span class="st"> </span>minReads)]</a>
-<a class="sourceLine" id="cb1-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb1-19" data-line-number="19">raw.data.filtered &lt;-<span class="st"> </span>raw.data[genesLeft_minReads,]</a>
-<a class="sourceLine" id="cb1-20" data-line-number="20"></a>
-<a class="sourceLine" id="cb1-21" data-line-number="21"><span class="co">#Create Seurat object and add relevant metadata</span></a>
-<a class="sourceLine" id="cb1-22" data-line-number="22"></a>
-<a class="sourceLine" id="cb1-23" data-line-number="23">ser &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/CreateSeuratObject">CreateSeuratObject</a></span>(raw.data.filtered)</a>
-<a class="sourceLine" id="cb1-24" data-line-number="24"></a>
-<a class="sourceLine" id="cb1-25" data-line-number="25">data.to.add &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="ot">NA</span>,<span class="dt">nrow=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(ser<span class="op">@</span>cell.names),<span class="dt">ncol=</span><span class="dv">4</span>))</a>
-<a class="sourceLine" id="cb1-26" data-line-number="26"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">rownames</a></span>(data.to.add) &lt;-<span class="st"> </span>ser<span class="op">@</span>cell.names</a>
-<a class="sourceLine" id="cb1-27" data-line-number="27"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(data.to.add) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"perc.mito"</span>,<span class="st">"perc.ribo"</span>,<span class="st">"sample.group"</span>,<span class="st">"sample.replicate"</span>)</a>
-<a class="sourceLine" id="cb1-28" data-line-number="28"></a>
-<a class="sourceLine" id="cb1-29" data-line-number="29">mito.genes &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grep</a></span>(<span class="st">"^MT-"</span>,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">rownames</a></span>(ser<span class="op">@</span>data),<span class="dt">value=</span>T)</a>
-<a class="sourceLine" id="cb1-30" data-line-number="30">perc.mito &lt;-<span class="st"> </span>Matrix<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/Matrix/topics/colSums">colSums</a></span>(ser<span class="op">@</span>raw.data[mito.genes,])<span class="op">/</span>Matrix<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/Matrix/topics/colSums">colSums</a></span>(ser<span class="op">@</span>raw.data)</a>
-<a class="sourceLine" id="cb1-31" data-line-number="31"></a>
-<a class="sourceLine" id="cb1-32" data-line-number="32">ribo.genes1 &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grep</a></span>(<span class="st">"^RPS"</span>,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">rownames</a></span>(ser<span class="op">@</span>data),<span class="dt">value=</span>T)</a>
-<a class="sourceLine" id="cb1-33" data-line-number="33">ribo.genes2 &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grep</a></span>(<span class="st">"^RPL"</span>,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">rownames</a></span>(ser<span class="op">@</span>data),<span class="dt">value=</span>T)</a>
-<a class="sourceLine" id="cb1-34" data-line-number="34">ribo.genes &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(ribo.genes1,ribo.genes2)</a>
-<a class="sourceLine" id="cb1-35" data-line-number="35">perc.ribo &lt;-<span class="st"> </span>Matrix<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/Matrix/topics/colSums">colSums</a></span>(ser<span class="op">@</span>raw.data[ribo.genes,])<span class="op">/</span>Matrix<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/Matrix/topics/colSums">colSums</a></span>(ser<span class="op">@</span>raw.data)</a>
-<a class="sourceLine" id="cb1-36" data-line-number="36"></a>
-<a class="sourceLine" id="cb1-37" data-line-number="37">data.to.add[,<span class="dv">1</span>] &lt;-<span class="st"> </span>perc.mito</a>
-<a class="sourceLine" id="cb1-38" data-line-number="38">data.to.add[,<span class="dv">2</span>] &lt;-<span class="st"> </span>perc.ribo</a>
-<a class="sourceLine" id="cb1-39" data-line-number="39"></a>
-<a class="sourceLine" id="cb1-40" data-line-number="40">data.to.add[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grep</a></span>(<span class="st">"^[ACTG]"</span>,ser<span class="op">@</span>cell.names),<span class="dv">3</span>] &lt;-<span class="st"> "PBMC"</span></a>
-<a class="sourceLine" id="cb1-41" data-line-number="41">data.to.add[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grep</a></span>(<span class="st">"^2"</span>,ser<span class="op">@</span>cell.names),<span class="dv">3</span>] &lt;-<span class="st"> "MALT"</span></a>
-<a class="sourceLine" id="cb1-42" data-line-number="42"></a>
-<a class="sourceLine" id="cb1-43" data-line-number="43"><span class="co">#Randomize cells from PBMC and MALT to two replicates each</span></a>
-<a class="sourceLine" id="cb1-44" data-line-number="44"></a>
-<a class="sourceLine" id="cb1-45" data-line-number="45">pbmc.group &lt;-<span class="st"> </span>data.to.add[data.to.add<span class="op">$</span>sample.group<span class="op">==</span><span class="st">"PBMC"</span>,]</a>
-<a class="sourceLine" id="cb1-46" data-line-number="46">pbmc.rep1 &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">rownames</a></span>(pbmc.group)[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sample">sample</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(pbmc.group)<span class="op">/</span><span class="dv">2</span>)]</a>
-<a class="sourceLine" id="cb1-47" data-line-number="47">pbmc.rep2 &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sets">setdiff</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">rownames</a></span>(pbmc.group),pbmc.rep1)</a>
-<a class="sourceLine" id="cb1-48" data-line-number="48">malt.group &lt;-<span class="st"> </span>data.to.add[data.to.add<span class="op">$</span>sample.group<span class="op">==</span><span class="st">"MALT"</span>,]</a>
-<a class="sourceLine" id="cb1-49" data-line-number="49">malt.rep1 &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">rownames</a></span>(malt.group)[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sample">sample</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(malt.group)<span class="op">/</span><span class="dv">2</span>)]</a>
-<a class="sourceLine" id="cb1-50" data-line-number="50">malt.rep2 &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sets">setdiff</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">rownames</a></span>(malt.group),malt.rep1)</a>
-<a class="sourceLine" id="cb1-51" data-line-number="51"></a>
-<a class="sourceLine" id="cb1-52" data-line-number="52">data.to.add[pbmc.rep1,<span class="dv">4</span>] &lt;-<span class="st"> "pbmc.rep1"</span></a>
-<a class="sourceLine" id="cb1-53" data-line-number="53">data.to.add[pbmc.rep2,<span class="dv">4</span>] &lt;-<span class="st"> "pbmc.rep2"</span></a>
-<a class="sourceLine" id="cb1-54" data-line-number="54">data.to.add[malt.rep1,<span class="dv">4</span>] &lt;-<span class="st"> "malt.rep1"</span></a>
-<a class="sourceLine" id="cb1-55" data-line-number="55">data.to.add[malt.rep2,<span class="dv">4</span>] &lt;-<span class="st"> "malt.rep2"</span></a>
-<a class="sourceLine" id="cb1-56" data-line-number="56"></a>
-<a class="sourceLine" id="cb1-57" data-line-number="57"><span class="co">#Add metadata to Seurat object</span></a>
-<a class="sourceLine" id="cb1-58" data-line-number="58"></a>
-<a class="sourceLine" id="cb1-59" data-line-number="59">ser &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/AddMetaData">AddMetaData</a></span>(ser,<span class="dt">metadata=</span>data.to.add)</a>
-<a class="sourceLine" id="cb1-60" data-line-number="60"></a>
-<a class="sourceLine" id="cb1-61" data-line-number="61"><span class="co">#Simple Seurat clustering workflow</span></a>
-<a class="sourceLine" id="cb1-62" data-line-number="62"></a>
-<a class="sourceLine" id="cb1-63" data-line-number="63">ser &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/NormalizeData">NormalizeData</a></span>(ser)</a>
-<a class="sourceLine" id="cb1-64" data-line-number="64">ser &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/FindVariableGenes">FindVariableGenes</a></span>(ser,<span class="dt">do.plot=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-65" data-line-number="65"><span class="co">#Remove TotalSeq antibodies from clustering analysis</span></a>
-<a class="sourceLine" id="cb1-66" data-line-number="66">ser<span class="op">@</span>var.genes &lt;-<span class="st"> </span>ser<span class="op">@</span>var.genes[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grep</a></span>(<span class="st">"Total"</span>,ser<span class="op">@</span>var.genes,<span class="dt">invert=</span>T)]</a>
-<a class="sourceLine" id="cb1-67" data-line-number="67">ser &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/ScaleData">ScaleData</a></span>(ser,<span class="dt">vars.to.regress=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"nGene"</span>,<span class="st">"perc.mito"</span>,<span class="st">"perc.ribo"</span>))</a></code></pre></div>
-<pre><code>## Regressing out: nGene, perc.mito, perc.ribo</code></pre>
-<pre><code>## 
-## Time Elapsed:  45.9231090545654 secs</code></pre>
-<pre><code>## Scaling data matrix</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">ser &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/RunPCA">RunPCA</a></span>(ser,<span class="dt">do.print=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/PCElbowPlot">PCElbowPlot</a></span>(ser)</a></code></pre></div>
-<p><img src="celltalker_files/figure-html/unnamed-chunk-2-1.png" width="70%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co">#We will select the first 10 PCs to use</span></a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb6-3" data-line-number="3">ser &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/RunTSNE">RunTSNE</a></span>(ser,<span class="dt">dims.use=</span><span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb6-4" data-line-number="4">ser &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/FindClusters">FindClusters</a></span>(ser,<span class="dt">dims.use=</span><span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,<span class="dt">res=</span><span class="fl">0.5</span>,<span class="dt">print.output=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb6-5" data-line-number="5">ser &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/BuildClusterTree">BuildClusterTree</a></span>(ser,<span class="dt">do.reorder=</span><span class="ot">TRUE</span>,<span class="dt">reorder.numeric=</span><span class="ot">TRUE</span>,<span class="dt">do.plot=</span><span class="ot">FALSE</span>,<span class="dt">show.progress=</span><span class="ot">FALSE</span>)</a></code></pre></div>
-<p>Now that we have generated our data, let’s have a look at it.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">p1 &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/TSNEPlot">TSNEPlot</a></span>(ser,<span class="dt">group.by=</span><span class="st">"tree.ident"</span>,<span class="dt">do.label=</span>T,<span class="dt">do.return=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">p2 &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/TSNEPlot">TSNEPlot</a></span>(ser,<span class="dt">group.by=</span><span class="st">"sample.group"</span>,<span class="dt">do.return=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">p3 &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/TSNEPlot">TSNEPlot</a></span>(ser,<span class="dt">group.by=</span><span class="st">"sample.replicate"</span>,<span class="dt">do.return=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb7-4" data-line-number="4">p1</a></code></pre></div>
-<p><img src="celltalker_files/figure-html/unnamed-chunk-3-1.png" width="672"></p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">plot_grid</span>(p2,p3)</a></code></pre></div>
-<p><img src="celltalker_files/figure-html/unnamed-chunk-3-2.png" width="672"></p>
-<p>Great! Now let’s customize our cluster labels by inferring cell types from the TotalSeq antibodies that were inlcuded in this experiment.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">total.seq.abs &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grep</a></span>(<span class="st">"Total"</span>,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">rownames</a></span>(ser<span class="op">@</span>raw.data),<span class="dt">value=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb9-2" data-line-number="2">total.seq.sub &lt;-<span class="st"> </span>total.seq.abs[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>]</a>
-<a class="sourceLine" id="cb9-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/FeaturePlot">FeaturePlot</a></span>(ser,<span class="dt">features=</span>total.seq.sub)</a></code></pre></div>
-<p><img src="celltalker_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">cell.types &lt;-<span class="st"> </span>ser<span class="op">@</span>meta.data<span class="op">$</span>tree.ident</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(cell.types) &lt;-<span class="st"> </span>ser<span class="op">@</span>cell.names</a>
-<a class="sourceLine" id="cb10-3" data-line-number="3">cell.types[cell.types<span class="op">==</span><span class="st">"1"</span>] &lt;-<span class="st"> "MALT_Tumor_1"</span></a>
-<a class="sourceLine" id="cb10-4" data-line-number="4">cell.types[cell.types<span class="op">==</span><span class="st">"2"</span>] &lt;-<span class="st"> "MALT_Tumor_2"</span></a>
-<a class="sourceLine" id="cb10-5" data-line-number="5">cell.types[cell.types<span class="op">==</span><span class="st">"3"</span>] &lt;-<span class="st"> "PBMC_CD14_1"</span></a>
-<a class="sourceLine" id="cb10-6" data-line-number="6">cell.types[cell.types<span class="op">==</span><span class="st">"4"</span>] &lt;-<span class="st"> "MALT_Tumor_3"</span></a>
-<a class="sourceLine" id="cb10-7" data-line-number="7">cell.types[cell.types<span class="op">==</span><span class="st">"5"</span>] &lt;-<span class="st"> "MALT_Tumor_4"</span></a>
-<a class="sourceLine" id="cb10-8" data-line-number="8">cell.types[cell.types<span class="op">==</span><span class="st">"6"</span>] &lt;-<span class="st"> "PBMC_B_cell"</span></a>
-<a class="sourceLine" id="cb10-9" data-line-number="9">cell.types[cell.types<span class="op">==</span><span class="st">"7"</span>] &lt;-<span class="st"> "PBMC_CD14_2"</span></a>
-<a class="sourceLine" id="cb10-10" data-line-number="10">cell.types[cell.types<span class="op">==</span><span class="st">"8"</span>] &lt;-<span class="st"> "PBMC_NK_1"</span></a>
-<a class="sourceLine" id="cb10-11" data-line-number="11">cell.types[cell.types<span class="op">==</span><span class="st">"9"</span>] &lt;-<span class="st"> "PBMC_NK_2"</span></a>
-<a class="sourceLine" id="cb10-12" data-line-number="12">cell.types[cell.types<span class="op">==</span><span class="st">"10"</span>] &lt;-<span class="st"> "PBMC_CD4_1"</span></a>
-<a class="sourceLine" id="cb10-13" data-line-number="13">cell.types[cell.types<span class="op">==</span><span class="st">"11"</span>] &lt;-<span class="st"> "PBMC_CD8_1"</span></a>
-<a class="sourceLine" id="cb10-14" data-line-number="14">cell.types[cell.types<span class="op">==</span><span class="st">"12"</span>] &lt;-<span class="st"> "PBMC_CD4_2"</span></a>
-<a class="sourceLine" id="cb10-15" data-line-number="15">cell.types[cell.types<span class="op">==</span><span class="st">"13"</span>] &lt;-<span class="st"> "MALT_CD4_1"</span></a>
-<a class="sourceLine" id="cb10-16" data-line-number="16">cell.types[cell.types<span class="op">==</span><span class="st">"14"</span>] &lt;-<span class="st"> "MALT_CD8_1"</span></a>
-<a class="sourceLine" id="cb10-17" data-line-number="17">cell.types[cell.types<span class="op">==</span><span class="st">"15"</span>] &lt;-<span class="st"> "MALT_CD4_2"</span></a>
-<a class="sourceLine" id="cb10-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb10-19" data-line-number="19">ser &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/AddMetaData">AddMetaData</a></span>(ser,<span class="dt">metadata=</span>cell.types,<span class="dt">col.name=</span><span class="st">"cell.types.clusters"</span>)</a>
-<a class="sourceLine" id="cb10-20" data-line-number="20"></a>
-<a class="sourceLine" id="cb10-21" data-line-number="21"><span class="kw"><a href="https://www.rdocumentation.org/packages/Seurat/topics/TSNEPlot">TSNEPlot</a></span>(ser,<span class="dt">group.by=</span><span class="st">"cell.types.clusters"</span>)</a></code></pre></div>
-<p><img src="celltalker_files/figure-html/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;"></p>
-</div>
-<div id="celltalker---consistently-expressed-ligands-and-receptors" class="section level1">
-<h1 class="hasAnchor">
-<a href="#celltalker---consistently-expressed-ligands-and-receptors" class="anchor"></a>celltalker - Consistently expressed ligands and receptors</h1>
-<p>Now that we have identified and named clusters within our data, we will proceed with the celltalker analysis. The first step is to use the reshape_matrices function to create a tibble with individual matrices for each replicate sample. We use tibbles (and more broadly, the tidyverse) throughout celltalker to make data manipulation more streamlined and to use the hierarchical structure of tibbles as containers for relevant pieces of data.</p>
-<p>We need a few key pieces of information from our Seurat analysis, which we define first. Shipped with this packages is the data.frame “ramilowski_pairs”, which is a data.frame consisting of ligands, receptors, and putative ligand_receptor pairs. One could potential add or substract to this list (i.e. could filter based only on pairs that have biologically proven interactions, or could add pairs that your lab has shown are relevant).</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">counts &lt;-<span class="st"> </span>ser<span class="op">@</span>raw.data</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2">defined.clusters &lt;-<span class="st"> </span>ser<span class="op">@</span>meta.data<span class="op">$</span>cell.types.clusters</a>
-<a class="sourceLine" id="cb11-3" data-line-number="3">defined.groups &lt;-<span class="st"> </span>ser<span class="op">@</span>meta.data<span class="op">$</span>sample.group</a>
-<a class="sourceLine" id="cb11-4" data-line-number="4">defined.replicates &lt;-<span class="st"> </span>ser<span class="op">@</span>meta.data<span class="op">$</span>sample.replicate</a>
-<a class="sourceLine" id="cb11-5" data-line-number="5">ramilowski_pairs[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,]</a></code></pre></div>
-<pre><code>##    ligand receptor         pair
-## 1     A2M     LRP1     A2M_LRP1
-## 2   AANAT   MTNR1A AANAT_MTNR1A
-## 3   AANAT   MTNR1B AANAT_MTNR1B
-## 4     ACE    AGTR2    ACE_AGTR2
-## 5     ACE   BDKRB2   ACE_BDKRB2
-## 6  ADAM10      AXL   ADAM10_AXL
-## 7  ADAM10    EPHA3 ADAM10_EPHA3
-## 8  ADAM12    ITGA9 ADAM12_ITGA9
-## 9  ADAM12    ITGB1 ADAM12_ITGB1
-## 10 ADAM12     SDC4  ADAM12_SDC4</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">reshaped.matrices &lt;-<span class="st"> </span><span class="kw"><a href="../reference/reshape_matrices.html">reshape_matrices</a></span>(<span class="dt">count.matrix=</span>counts,<span class="dt">clusters=</span>defined.clusters,<span class="dt">groups=</span>defined.groups,<span class="dt">replicates=</span>defined.replicates,<span class="dt">ligands.and.receptors=</span>ramilowski_pairs)</a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="co">#Check out the hierarchy of the tibble</span></a>
-<a class="sourceLine" id="cb13-4" data-line-number="4">reshaped.matrices</a></code></pre></div>
-<pre><code>## # A tibble: 2 x 2
-##   name  value           
-##   &lt;chr&gt; &lt;list&gt;          
-## 1 MALT  &lt;tibble [2 × 2]&gt;
-## 2 PBMC  &lt;tibble [2 × 2]&gt;</code></pre>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="kw">unnest</span>(reshaped.matrices[<span class="dv">1</span>,<span class="dv">2</span>])</a></code></pre></div>
-<pre><code>## # A tibble: 2 x 2
-##   sample    value            
-##   &lt;chr&gt;     &lt;list&gt;           
-## 1 malt.rep1 &lt;named list [15]&gt;
-## 2 malt.rep2 &lt;named list [15]&gt;</code></pre>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(<span class="kw">pull</span>(<span class="kw">unnest</span>(reshaped.matrices[<span class="dv">1</span>,<span class="dv">2</span>]))[[<span class="dv">1</span>]])</a></code></pre></div>
-<pre><code>##  [1] "MALT_CD4_1"   "MALT_CD4_2"   "MALT_CD8_1"   "MALT_Tumor_1"
-##  [5] "MALT_Tumor_2" "MALT_Tumor_3" "MALT_Tumor_4" "PBMC_B_cell" 
-##  [9] "PBMC_CD14_1"  "PBMC_CD14_2"  "PBMC_CD4_1"   "PBMC_CD4_2"  
-## [13] "PBMC_CD8_1"   "PBMC_NK_1"    "PBMC_NK_2"</code></pre>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/dim">dim</a></span>(<span class="kw">pull</span>(<span class="kw">unnest</span>(reshaped.matrices[<span class="dv">1</span>,<span class="dv">2</span>]))[[<span class="dv">1</span>]][[<span class="dv">1</span>]])</a></code></pre></div>
-<pre><code>## [1] 981 341</code></pre>
-<p>What we have done in this initial step is to separate the big expression matrix into a series of individual expression matrices from each patient. An overview of the hierarchy is as follows:</p>
-<ul>
-<li>Tibble with second column containing tibbles of the sample groups
-<ul>
-<li>Tibble with the second column containing lists of the expression matrices from each replicate
-<ul>
-<li>List of count matrices from each cluster of an individual replicate</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p>Next, we can create a tibble of consistently expressed ligands and receptors for each group using the create_lig_rec_tib function.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">consistent.lig.recs &lt;-<span class="st"> </span><span class="kw"><a href="../reference/create_lig_rec_tib.html">create_lig_rec_tib</a></span>(<span class="dt">exp.tib=</span>reshaped.matrices,<span class="dt">clusters=</span>defined.clusters,<span class="dt">groups=</span>defined.groups,<span class="dt">replicates=</span>defined.replicates,<span class="dt">cells.reqd=</span><span class="dv">10</span>,<span class="dt">freq.pos.reqd=</span><span class="fl">0.5</span>,<span class="dt">ligands.and.receptors=</span>ramilowski_pairs)</a>
-<a class="sourceLine" id="cb21-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb21-3" data-line-number="3">consistent.lig.recs</a></code></pre></div>
-<pre><code>## # A tibble: 2 x 2
-##   name  value            
-##   &lt;chr&gt; &lt;list&gt;           
-## 1 MALT  &lt;tibble [15 × 2]&gt;
-## 2 PBMC  &lt;tibble [15 × 2]&gt;</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1"><span class="kw">pull</span>(consistent.lig.recs[<span class="dv">1</span>,<span class="dv">2</span>])</a></code></pre></div>
-<pre><code>## [[1]]
-## # A tibble: 15 x 2
-##    cluster.id   ligands.and.receptors
-##    &lt;chr&gt;        &lt;named list&gt;         
-##  1 MALT_CD4_1   &lt;named list [2]&gt;     
-##  2 MALT_CD4_2   &lt;named list [2]&gt;     
-##  3 MALT_CD8_1   &lt;named list [2]&gt;     
-##  4 MALT_Tumor_1 &lt;named list [2]&gt;     
-##  5 MALT_Tumor_2 &lt;named list [2]&gt;     
-##  6 MALT_Tumor_3 &lt;named list [2]&gt;     
-##  7 MALT_Tumor_4 &lt;named list [2]&gt;     
-##  8 PBMC_B_cell  &lt;named list [2]&gt;     
-##  9 PBMC_CD14_1  &lt;named list [2]&gt;     
-## 10 PBMC_CD14_2  &lt;named list [2]&gt;     
-## 11 PBMC_CD4_1   &lt;named list [2]&gt;     
-## 12 PBMC_CD4_2   &lt;named list [2]&gt;     
-## 13 PBMC_CD8_1   &lt;named list [2]&gt;     
-## 14 PBMC_NK_1    &lt;named list [2]&gt;     
-## 15 PBMC_NK_2    &lt;named list [2]&gt;</code></pre>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="kw">pull</span>(<span class="kw">unnest</span>(consistent.lig.recs[<span class="dv">1</span>,<span class="dv">2</span>])[<span class="dv">1</span>,<span class="dv">2</span>])</a></code></pre></div>
-<pre><code>## [[1]]
-## [[1]]$ligands
-##   [1] "UTS2"     "C1QA"     "C1QB"     "YARS"     "COL9A2"   "ITGB3BP" 
-##   [7] "S100A9"   "ADAM15"   "SEMA4A"   "IL10"     "CD55"     "ARF1"    
-##  [13] "ADAM17"   "POMC"     "PIGF"     "CALM2"    "RTN4"     "IL1B"    
-##  [19] "IL1RN"    "CCL20"    "PTMA"     "FARP2"    "LTF"      "GNAI2"   
-##  [25] "BTLA"     "TNFSF10"  "SPON2"    "LRPAP1"   "QDPR"     "CXCL2"   
-##  [31] "AREG"     "CXCL13"   "IL15"     "HBEGF"    "CD14"     "LY86"    
-##  [37] "HLA-A"    "HLA-E"    "HLA-C"    "HLA-B"    "TNF"      "LTB"     
-##  [43] "HSPA1A"   "VEGFA"    "CD24"     "ULBP2"    "SYTL3"    "PDGFA"   
-##  [49] "IL6"      "PON2"     "PDAP1"    "NAMPT"    "TIMP1"    "CD40LG"  
-##  [55] "ADAM28"   "PNOC"     "ADAM9"    "PTDSS1"   "ANXA1"    "SEMA4D"  
-##  [61] "TNFSF8"   "HRAS"     "NUCB2"    "LIN7C"    "VEGFB"    "LTBP3"   
-##  [67] "GSTP1"    "MMP7"     "VIM"      "PSAP"     "HEBP1"    "GDF11"   
-##  [73] "IL23A"    "IFNG"     "LYZ"      "HSP90B1"  "SELPLG"   "HMGB1"   
-##  [79] "ALOX5AP"  "TNFSF13B" "PSEN1"    "CALM1"    "SERPINA1" "HSP90AA1"
-##  [85] "SPINT1"   "B2M"      "ADAM10"   "PKM"      "SEMA7A"   "IL16"    
-##  [91] "NMB"      "MFGE8"    "SEMA4B"   "ZG16B"    "CXCL16"   "TNFSF12" 
-##  [97] "CCL5"     "CCL3"     "CCL4"     "CCL3L1"   "IGFBP4"   "ICAM2"   
-## [103] "TIMP2"    "LGALS3BP" "P4HB"     "SLPI"     "MMP9"     "GNAS"    
-## [109] "COL9A3"   "FGF22"    "TNFSF9"   "CD70"     "ICAM1"    "ICAM3"   
-## [115] "CALR"     "UBA52"    "GPI"      "TGFB1"    "RPS19"    "APOE"    
-## [121] "VASP"     "CALM3"    "FLT3LG"   "CLEC11A"  "OSM"      "DUSP18"  
-## [127] "MFNG"     "APP"      "COL6A2"  
+<p>Our vignette begins with a standard clustering analysis and identification of immune lineages in Seurat, and assumes that the feature/barcode matrices have been downloaded from GEO.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>({</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(Seurat)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(celltalker)</span>
+<span id="cb1-4"><a href="#cb1-4"></a>})</span>
+<span id="cb1-5"><a href="#cb1-5"></a></span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="co">#Set seed for reproducibility</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a></span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="kw"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="dv">02221989</span>)</span>
+<span id="cb1-9"><a href="#cb1-9"></a></span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="co">#Read in raw data</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a></span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="kw"><a href="https://rdrr.io/r/base/getwd.html">setwd</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(path.to.working,<span class="st">"/data_matrices/"</span>,<span class="dt">sep=</span><span class="st">""</span>))</span>
+<span id="cb1-13"><a href="#cb1-13"></a>data.paths &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span>()</span>
+<span id="cb1-14"><a href="#cb1-14"></a>specific.paths &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(path.to.working,<span class="st">"data_matrices"</span>,data.paths,<span class="st">"GRCh38"</span>,<span class="dt">sep=</span><span class="st">"/"</span>)</span>
+<span id="cb1-15"><a href="#cb1-15"></a><span class="kw"><a href="https://rdrr.io/r/base/getwd.html">setwd</a></span>(path.to.working)</span>
+<span id="cb1-16"><a href="#cb1-16"></a></span>
+<span id="cb1-17"><a href="#cb1-17"></a>raw.data &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/Read10X.html">Read10X</a></span>(specific.paths)</span>
+<span id="cb1-18"><a href="#cb1-18"></a></span>
+<span id="cb1-19"><a href="#cb1-19"></a><span class="co">#Create metadata</span></span>
+<span id="cb1-20"><a href="#cb1-20"></a></span>
+<span id="cb1-21"><a href="#cb1-21"></a>sample.data &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="dt">data=</span><span class="ot">NA</span>,<span class="dt">nrow=</span><span class="kw"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(raw.data),<span class="dt">ncol=</span><span class="dv">2</span>))</span>
+<span id="cb1-22"><a href="#cb1-22"></a><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(sample.data) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(raw.data)</span>
+<span id="cb1-23"><a href="#cb1-23"></a><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(sample.data) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"sample.id"</span>,<span class="st">"sample.type"</span>)</span>
+<span id="cb1-24"><a href="#cb1-24"></a></span>
+<span id="cb1-25"><a href="#cb1-25"></a>sample.data[<span class="kw"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="st">"^[A-z]"</span>,<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(sample.data)),<span class="st">"sample.id"</span>] &lt;-<span class="st"> "pbmc_1"</span></span>
+<span id="cb1-26"><a href="#cb1-26"></a>sample.data[<span class="kw"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="st">"^2"</span>,<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(sample.data)),<span class="st">"sample.id"</span>] &lt;-<span class="st"> "tonsil_1"</span></span>
+<span id="cb1-27"><a href="#cb1-27"></a>sample.data[<span class="kw"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="st">"^3"</span>,<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(sample.data)),<span class="st">"sample.id"</span>] &lt;-<span class="st"> "pbmc_2"</span></span>
+<span id="cb1-28"><a href="#cb1-28"></a>sample.data[<span class="kw"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="st">"^4"</span>,<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(sample.data)),<span class="st">"sample.id"</span>] &lt;-<span class="st"> "tonsil_2"</span></span>
+<span id="cb1-29"><a href="#cb1-29"></a>sample.data[<span class="kw"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="st">"^5"</span>,<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(sample.data)),<span class="st">"sample.id"</span>] &lt;-<span class="st"> "pbmc_3"</span></span>
+<span id="cb1-30"><a href="#cb1-30"></a>sample.data[<span class="kw"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="st">"^6"</span>,<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(sample.data)),<span class="st">"sample.id"</span>] &lt;-<span class="st"> "tonsil_3"</span></span>
+<span id="cb1-31"><a href="#cb1-31"></a></span>
+<span id="cb1-32"><a href="#cb1-32"></a>sample.data[,<span class="st">"sample.type"</span>] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span>(sample.data<span class="op">$</span>sample.id,<span class="dt">split=</span><span class="st">"_"</span>),<span class="cf">function</span>(x) x[<span class="dv">1</span>])</span>
+<span id="cb1-33"><a href="#cb1-33"></a></span>
+<span id="cb1-34"><a href="#cb1-34"></a><span class="co">#Create a Seurat object with associated metadata</span></span>
+<span id="cb1-35"><a href="#cb1-35"></a></span>
+<span id="cb1-36"><a href="#cb1-36"></a>ser.obj &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/CreateSeuratObject.html">CreateSeuratObject</a></span>(<span class="dt">counts=</span>raw.data,<span class="dt">meta.data=</span>sample.data)</span></code></pre></div>
+<pre><code>## Warning: Feature names cannot have underscores ('_'), replacing with dashes
+## ('-')</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co">#Standard Seurat workflow</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a>ser.obj &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/NormalizeData.html">NormalizeData</a></span>(ser.obj)</span>
+<span id="cb3-4"><a href="#cb3-4"></a>ser.obj &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/FindVariableFeatures.html">FindVariableFeatures</a></span>(ser.obj)</span>
+<span id="cb3-5"><a href="#cb3-5"></a>ser.obj &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/ScaleData.html">ScaleData</a></span>(ser.obj)</span></code></pre></div>
+<pre><code>## Centering and scaling data matrix</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>ser.obj &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/RunPCA.html">RunPCA</a></span>(ser.obj)</span></code></pre></div>
+<pre><code>## PC_ 1 
+## Positive:  S100A6, IL32, S100A4, ANXA1, VIM, FTL, TRBC1, SRGN, S100A9, S100A8 
+##     TYROBP, LYZ, CTSW, XIST, NEAT1, VCAN, S100A12, FCER1G, S100A11, FCN1 
+##     PLAC8, ID2, CCL5, NKG7, CST3, CSTA, ZFP36, IL1B, MT2A, KLRB1 
+## Negative:  RGS13, KIAA0101, NUSAP1, AURKB, MKI67, BIRC5, TYMS, TOP2A, TK1, CDKN3 
+##     UBE2C, PTTG1, CDK1, STMN1, CCNB2, GTSE1, BIK, RRM2, TCL1A, SHCBP1 
+##     CDCA3, CDC20, TPX2, LRMP, CCNA2, MND1, CCNB1, PBK, ZWINT, RMI2 
+## PC_ 2 
+## Positive:  CST3, LYZ, FCN1, CSTA, S100A9, S100A8, TYROBP, LST1, FGL2, VCAN 
+##     S100A12, SERPINA1, MNDA, FCER1G, CLEC7A, MS4A6A, CD14, CFD, IL1B, TYMP 
+##     LGALS1, RP11-1143G9.4, AIF1, CTSS, NAMPT, CFP, TNFSF13B, CSF3R, MPEG1, TMEM176B 
+## Negative:  IL32, NPM1, CD69, TRBC1, ISG20, ITM2A, IGKC, IGHA1, HSP90AB1, DDIT4 
+##     HIST1H4C, PSIP1, AQP3, MYC, PIM2, HMGN1, PASK, NUCB2, HSPA1B, HSPB1 
+##     CD79A, SUSD3, KLRB1, SYNE2, CHI3L2, IGHG3, IGLC2, FKBP11, IGHG1, SH2D1A 
+## PC_ 3 
+## Positive:  IL32, NKG7, CTSW, TRBC1, GZMA, CST7, GNLY, MKI67, ANXA1, TOP2A 
+##     CCL5, PRF1, BIRC5, S100A4, KLRB1, CCNA2, AURKB, CENPF, GTSE1, CDKN3 
+##     KLRD1, UBE2C, CDK1, TYMS, TPX2, RRM2, ID2, S100A6, FGFBP2, CDC20 
+## Negative:  HLA-DRA, HLA-DQA1, HLA-DQB1, CD79A, HLA-DRB1, MS4A1, CD74, HLA-DPA1, HLA-DPB1, CD79B 
+##     HLA-DMA, HLA-DMB, BANK1, VPREB3, IGKC, HLA-DRB5, MEF2C, CD22, IRF8, CD19 
+##     SMIM14, FCRLA, HLA-DOB, CD24, CD40, FCER2, BLK, HLA-DQA2, IGHD, CTSH 
+## PC_ 4 
+## Positive:  TOP2A, UBE2C, MKI67, GTSE1, CENPF, AURKB, PLK1, CCNA2, CDK1, CDCA8 
+##     HMMR, CDCA3, CDC20, TPX2, CDKN3, DLGAP5, CENPE, BIRC5, CCNB2, CENPA 
+##     KIF2C, CKAP2L, PBK, NUSAP1, KIFC1, AURKA, SPC25, NUF2, KIF23, ASPM 
+## Negative:  NKG7, GNLY, CST7, GZMB, GZMA, PRF1, KLRD1, FGFBP2, CCL5, KLRF1 
+##     HOPX, CTSW, GZMH, TRDC, FCGR3A, SPON2, CLIC3, MATK, ADGRG1, S1PR5 
+##     CCL4, CMC1, XCL2, PFN1, CD160, FCRL6, IL2RB, TRGC1, KLRC1, C12orf75 
+## PC_ 5 
+## Positive:  ICA1, PDCD1, TBC1D4, ITM2A, ICOS, MAF, TOX2, IL32, TNFRSF4, PASK 
+##     PKM, SMCO4, ACTG1, CORO1B, CTLA4, NPM1, TRBC1, PCAT29, TIGIT, AC133644.2 
+##     TOX, ANP32B, ENO1, GBP2, COTL1, GAPDH, SUSD3, PIM2, AQP3, SERPINA9 
+## Negative:  NKG7, GNLY, KLRD1, FGFBP2, GZMB, GZMA, KLRF1, CCL5, PRF1, TRDC 
+##     GZMH, CST7, CTSW, BANK1, MATK, PLK1, HMMR, HLA-DPB1, CENPA, CLIC3 
+##     GTSE1, CENPE, CCL4, SPON2, PDLIM1, HLA-DPA1, CDCA8, DLGAP5, TPX2, IGHD</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/ElbowPlot.html">ElbowPlot</a></span>(ser.obj)</span></code></pre></div>
+<p><img src="celltalker_files/figure-html/unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co">#We will select the first 15 PCs to use</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a></span>
+<span id="cb8-3"><a href="#cb8-3"></a>ser.obj &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/RunUMAP.html">RunUMAP</a></span>(ser.obj,<span class="dt">reduction=</span><span class="st">"pca"</span>,<span class="dt">dims=</span><span class="dv">1</span><span class="op">:</span><span class="dv">15</span>)</span></code></pre></div>
+<pre><code>## Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+## To use Python UMAP via reticulate, set umap.method to 'umap-learn' and metric to 'correlation'
+## This message will be shown once per session</code></pre>
+<pre><code>## 00:25:40 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>## 00:25:40 Read 15524 rows and found 15 numeric columns</code></pre>
+<pre><code>## 00:25:40 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>## 00:25:40 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>## 0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
+<pre><code>## [----|----|----|----|----|----|----|----|----|----|</code></pre>
+<pre><code>## **************************************************|
+## 00:25:42 Writing NN index file to temp file /var/folders/_p/n2bykf5555bcpmdl3yfw8y540000gn/T//Rtmp1P2ywh/file180f66b002cad
+## 00:25:42 Searching Annoy index using 1 thread, search_k = 3000
+## 00:25:47 Annoy recall = 100%
+## 00:25:48 Commencing smooth kNN distance calibration using 1 thread
+## 00:25:48 Initializing from normalized Laplacian + noise
+## 00:25:50 Commencing optimization for 200 epochs, with 656278 positive edges
+## 00:26:00 Optimization finished</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>ser.obj &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/FindNeighbors.html">FindNeighbors</a></span>(ser.obj,<span class="dt">reduction=</span><span class="st">"pca"</span>,<span class="dt">dims=</span><span class="dv">1</span><span class="op">:</span><span class="dv">15</span>)</span></code></pre></div>
+<pre><code>## Computing nearest neighbor graph
+## Computing SNN</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>ser.obj &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/FindClusters.html">FindClusters</a></span>(ser.obj,<span class="dt">resolution=</span><span class="fl">0.5</span>)</span></code></pre></div>
+<pre><code>## Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
 ## 
-## [[1]]$receptors
-##   [1] "TNFRSF18"  "TNFRSF4"   "TNFRSF14"  "TNFRSF25"  "TNFRSF9"  
-##   [6] "TNFRSF1B"  "IFNLR1"    "TMEM222"   "PTCH2"     "TGFBR3"   
-##  [11] "S1PR1"     "CD53"      "NOTCH2"    "IL6R"      "NCSTN"    
-##  [16] "CD48"      "F11R"      "CD247"     "SELL"      "ADIPOR1"  
-##  [21] "CR1"       "CD46"      "KIDINS220" "IL18R1"    "CXCR4"    
-##  [26] "DPP4"      "ITGA6"     "ITGA4"     "ITGAV"     "SLC40A1"  
-##  [31] "BMPR2"     "CD28"      "RAMP1"     "TGFBR2"    "RPSA"     
-##  [36] "VIPR1"     "CCR2"      "CD47"      "PLXND1"    "RYK"      
-##  [41] "TFRC"      "TLR1"      "IL7R"      "IL6ST"     "CD180"    
-##  [46] "F2R"       "ERAP1"     "ADRB2"     "CSF1R"     "CD74"     
-##  [51] "HRH2"      "CANX"      "HLA-F"     "NCR3"      "IFNGR1"   
-##  [56] "IGF2R"     "CCR6"      "CLDN4"     "ORAI2"     "CAV1"     
-##  [61] "EPHB6"     "CSF2RA"    "PHEX"      "ATP6AP2"   "MAGED1"   
-##  [66] "IL2RG"     "CXCR3"     "PGRMC1"    "PLXNA3"    "TNFRSF10B"
-##  [71] "TNFRSF10A" "FGFR1"     "LY96"      "TMEM67"    "PLGRKT"   
-##  [76] "IL11RA"    "CD72"      "TGFBR1"    "ENG"       "NOTCH1"   
-##  [81] "TRAF2"     "IFITM1"    "CD151"     "CD81"      "KCNQ1"    
-##  [86] "CD44"      "CD82"      "CD5"       "IL10RA"    "CD3D"     
-##  [91] "CD3G"      "CXCR5"     "SORL1"     "APLP2"     "ST14"     
-##  [96] "IL2RA"     "ITGB1"     "ALOX5"     "FAS"       "ADIPOR2"  
-## [101] "CD9"       "TNFRSF1A"  "LTBR"      "CD27"      "CD4"      
-## [106] "KLRG1"     "CLEC2B"    "KLRD1"     "LMBR1L"    "ITGB7"    
-## [111] "ITGA5"     "CD63"      "PLXNC1"    "P2RX7"     "LAMP1"    
-## [116] "TRAF3"     "NPTN"      "TMEM8A"    "MGRN1"     "TNFRSF17" 
-## [121] "IL4R"      "IL21R"     "CD19"      "ITGAL"     "ITGAM"    
-## [126] "ITGAX"     "ADCY7"     "AMFR"      "ITGAE"     "TNFRSF13B"
-## [131] "CCR7"      "CCR10"     "PECAM1"    "JMJD6"     "SIRPB1"   
-## [136] "SIRPG"     "SIRPA"     "PTPRA"     "THBD"      "SDC4"     
-## [141] "CD40"      "OGFR"      "S1PR4"     "INSR"      "LDLR"     
-## [146] "EPOR"      "IL27RA"    "IL12RB1"   "LPAR2"     "LSR"      
-## [151] "IGFLR1"    "TYROBP"    "CD79A"     "PLAUR"     "KCNN4"    
-## [156] "PTGIR"     "FPR1"      "IL17RA"    "CSF2RB"    "IL2RB"    
-## [161] "TNFRSF13C" "PLXNB2"    "IFNAR2"    "IFNAR1"    "IFNGR2"   
-## [166] "SLC37A1"   "ITGB2"</code></pre>
-<p>We can see here that we have now recovered a list of consistently expressed ligands and receptors from each cluster in each experimental group, based on the criteria specified above (i.e. at least 5 cells in each cluster express the ligand/receptor and at least 50% of replicates in a group express the ligand/receptor). Functionally, since we only have 2 replicates in each group here, we require all replicate to express the ligand/receptor to count it as consistently expressed (since we only have 2 replicates, requiring 50% of samples to be positive is the same as requiring all samples to be positive).</p>
+## Number of nodes: 15524
+## Number of edges: 543084
+## 
+## Running Louvain algorithm...
+## Maximum modularity in 10 random starts: 0.9185
+## Number of communities: 17
+## Elapsed time: 2 seconds</code></pre>
+<p>Let’s have a look at our data.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>p1 &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/DimPlot.html">DimPlot</a></span>(ser.obj,<span class="dt">reduction=</span><span class="st">"umap"</span>,<span class="dt">group.by=</span><span class="st">"sample.id"</span>)</span>
+<span id="cb21-2"><a href="#cb21-2"></a>p2 &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/DimPlot.html">DimPlot</a></span>(ser.obj,<span class="dt">reduction=</span><span class="st">"umap"</span>,<span class="dt">group.by=</span><span class="st">"sample.type"</span>)</span>
+<span id="cb21-3"><a href="#cb21-3"></a>p3 &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/DimPlot.html">DimPlot</a></span>(ser.obj,<span class="dt">reduction=</span><span class="st">"umap"</span>,<span class="dt">group.by=</span><span class="st">"RNA_snn_res.0.5"</span>,<span class="dt">label=</span>T) <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/SeuratTheme.html">NoLegend</a></span>()</span></code></pre></div>
+<pre><code>## Warning: Using `as.character()` on a quosure is deprecated as of rlang 0.3.0.
+## Please use `as_label()` or `as_name()` instead.
+## This warning is displayed once per session.</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>cowplot<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/cowplot/man/plot_grid.html">plot_grid</a></span>(p1,p2,p3)</span></code></pre></div>
+<p><img src="celltalker_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;"></p>
+<p>Great! Now let’s (roughly) identify our cell types by having a look at a feature plot.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/FeaturePlot.html">FeaturePlot</a></span>(ser.obj,<span class="dt">reduction=</span><span class="st">"umap"</span>,<span class="dt">features=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"CD3D"</span>,<span class="st">"CD8A"</span>,<span class="st">"CD4"</span>,<span class="st">"CD14"</span>,<span class="st">"MS4A1"</span>,<span class="st">"FCGR3A"</span>,<span class="st">"IL3RA"</span>))</span></code></pre></div>
+<p><img src="celltalker_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="co">#Add metadata for cell types</span></span>
+<span id="cb25-2"><a href="#cb25-2"></a></span>
+<span id="cb25-3"><a href="#cb25-3"></a>cell.types &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/vector.html">vector</a></span>(<span class="st">"logical"</span>,<span class="dt">length=</span><span class="kw"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(ser.obj))</span>
+<span id="cb25-4"><a href="#cb25-4"></a><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(cell.types) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(ser.obj)</span>
+<span id="cb25-5"><a href="#cb25-5"></a></span>
+<span id="cb25-6"><a href="#cb25-6"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"0"</span>] &lt;-<span class="st"> "cd4.tconv"</span></span>
+<span id="cb25-7"><a href="#cb25-7"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"1"</span>] &lt;-<span class="st"> "cd4.tconv"</span></span>
+<span id="cb25-8"><a href="#cb25-8"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"2"</span>] &lt;-<span class="st"> "b.cells"</span></span>
+<span id="cb25-9"><a href="#cb25-9"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"3"</span>] &lt;-<span class="st"> "b.cells"</span></span>
+<span id="cb25-10"><a href="#cb25-10"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"4"</span>] &lt;-<span class="st"> "cd14.monocytes"</span></span>
+<span id="cb25-11"><a href="#cb25-11"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"5"</span>] &lt;-<span class="st"> "cd8.cells"</span></span>
+<span id="cb25-12"><a href="#cb25-12"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"6"</span>] &lt;-<span class="st"> "cd4.tconv"</span></span>
+<span id="cb25-13"><a href="#cb25-13"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"7"</span>] &lt;-<span class="st"> "cd4.tconv"</span></span>
+<span id="cb25-14"><a href="#cb25-14"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"8"</span>] &lt;-<span class="st"> "b.cells"</span></span>
+<span id="cb25-15"><a href="#cb25-15"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"9"</span>] &lt;-<span class="st"> "b.cells"</span></span>
+<span id="cb25-16"><a href="#cb25-16"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"10"</span>] &lt;-<span class="st"> "nk.cells"</span></span>
+<span id="cb25-17"><a href="#cb25-17"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"11"</span>] &lt;-<span class="st"> "cd8.cells"</span></span>
+<span id="cb25-18"><a href="#cb25-18"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"12"</span>] &lt;-<span class="st"> "plasma.cells"</span></span>
+<span id="cb25-19"><a href="#cb25-19"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"13"</span>] &lt;-<span class="st"> "cd14.monocytes"</span></span>
+<span id="cb25-20"><a href="#cb25-20"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"14"</span>] &lt;-<span class="st"> "cd16.monocytes"</span></span>
+<span id="cb25-21"><a href="#cb25-21"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"15"</span>] &lt;-<span class="st"> "pdc"</span></span>
+<span id="cb25-22"><a href="#cb25-22"></a>cell.types[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"16"</span>] &lt;-<span class="st"> "RBCs"</span></span>
+<span id="cb25-23"><a href="#cb25-23"></a></span>
+<span id="cb25-24"><a href="#cb25-24"></a>ser.obj[[<span class="st">"cell.types"</span>]] &lt;-<span class="st"> </span>cell.types</span>
+<span id="cb25-25"><a href="#cb25-25"></a></span>
+<span id="cb25-26"><a href="#cb25-26"></a><span class="co">#Let's remove RBCs from our analysis</span></span>
+<span id="cb25-27"><a href="#cb25-27"></a></span>
+<span id="cb25-28"><a href="#cb25-28"></a>rbc.cell.names &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(cell.types)[ser.obj<span class="op">@</span>meta.data<span class="op">$</span>RNA_snn_res.<span class="fl">0.5</span><span class="op">==</span><span class="st">"16"</span>]</span>
+<span id="cb25-29"><a href="#cb25-29"></a></span>
+<span id="cb25-30"><a href="#cb25-30"></a>ser.obj &lt;-<span class="st"> </span>ser.obj[,<span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(ser.obj) <span class="op">%in%</span><span class="st"> </span>rbc.cell.names]</span></code></pre></div>
+</div>
+<div id="celltalker" class="section level1">
+<h1 class="hasAnchor">
+<a href="#celltalker" class="anchor"></a>celltalker</h1>
+</div>
+<div id="consistently-expressed-ligands-and-receptors" class="section level1">
+<h1 class="hasAnchor">
+<a href="#consistently-expressed-ligands-and-receptors" class="anchor"></a>Consistently expressed ligands and receptors</h1>
+<p>Now that we have identified and named clusters within our data, we will proceed with the celltalker analysis. Shipped with this packages is the data.frame “ramilowski_pairs”, which is a data.frame consisting of ligands, receptors, and putative ligand_receptor pairs. Please refer to the “data-raw” folder, and the “create_ramolowski_pairs_data.R” file if your interested in how this data.frame was constructed.</p>
+<p>First, we will perform differential gene expression analysis to prune the universe of potential ligands and receptors down to those that are differentially expressed between our two sample groups. We identify ligands and receptors (from ramilowski_pairs) present in our overall dataset, then perform differential expression using those ligands and receptors.</p>
+<p>Second, we will create a tibble with individual matrices for each replicate sample. We use tibbles (and more broadly, the tidyverse) throughout celltalker to make data manipulation more streamlined and to use the hierarchical structure of tibbles as containers for relevant pieces of data.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="co">#Check out ramilowski_pairs data.frame</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a></span>
+<span id="cb26-3"><a href="#cb26-3"></a><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(ramilowski_pairs)</span></code></pre></div>
+<pre><code>##   ligand receptor         pair
+## 1    A2M     LRP1     A2M_LRP1
+## 2  AANAT   MTNR1A AANAT_MTNR1A
+## 3  AANAT   MTNR1B AANAT_MTNR1B
+## 4    ACE    AGTR2    ACE_AGTR2
+## 5    ACE   BDKRB2   ACE_BDKRB2
+## 6 ADAM10      AXL   ADAM10_AXL</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="kw"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(ramilowski_pairs)</span></code></pre></div>
+<pre><code>## [1] 2557    3</code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a><span class="co">#There are 2,557 unique ligand/receptor interactions in this dataset</span></span>
+<span id="cb30-2"><a href="#cb30-2"></a></span>
+<span id="cb30-3"><a href="#cb30-3"></a><span class="co">#Identification of differentially expressed ligands and receptors</span></span>
+<span id="cb30-4"><a href="#cb30-4"></a></span>
+<span id="cb30-5"><a href="#cb30-5"></a><span class="co">#Identify ligands and receptors in our dataset</span></span>
+<span id="cb30-6"><a href="#cb30-6"></a></span>
+<span id="cb30-7"><a href="#cb30-7"></a>ligs &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(ramilowski_pairs<span class="op">$</span>ligand))</span>
+<span id="cb30-8"><a href="#cb30-8"></a>recs &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(ramilowski_pairs<span class="op">$</span>receptor))</span>
+<span id="cb30-9"><a href="#cb30-9"></a></span>
+<span id="cb30-10"><a href="#cb30-10"></a>ligs.present &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(ser.obj)[<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(ser.obj) <span class="op">%in%</span><span class="st"> </span>ligs]</span>
+<span id="cb30-11"><a href="#cb30-11"></a>recs.present &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(ser.obj)[<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(ser.obj) <span class="op">%in%</span><span class="st"> </span>recs]</span>
+<span id="cb30-12"><a href="#cb30-12"></a></span>
+<span id="cb30-13"><a href="#cb30-13"></a>genes.to.use &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/sets.html">union</a></span>(ligs.present,recs.present)</span>
+<span id="cb30-14"><a href="#cb30-14"></a></span>
+<span id="cb30-15"><a href="#cb30-15"></a><span class="co">#Use FindAllMarkers for differentially expressed ligands and receptors between groups</span></span>
+<span id="cb30-16"><a href="#cb30-16"></a></span>
+<span id="cb30-17"><a href="#cb30-17"></a><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/Idents.html">Idents</a></span>(ser.obj) &lt;-<span class="st"> "sample.type"</span></span>
+<span id="cb30-18"><a href="#cb30-18"></a>markers &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/FindAllMarkers.html">FindAllMarkers</a></span>(ser.obj,<span class="dt">assay=</span><span class="st">"RNA"</span>,<span class="dt">features=</span>genes.to.use,<span class="dt">only.pos=</span><span class="ot">TRUE</span>)</span></code></pre></div>
+<pre><code>## Calculating cluster pbmc</code></pre>
+<pre><code>## Calculating cluster tonsil</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a>ligs.recs.use &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(markers<span class="op">$</span>gene)</span>
+<span id="cb33-2"><a href="#cb33-2"></a><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(ligs.recs.use)</span></code></pre></div>
+<pre><code>## [1] 61</code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a><span class="co">#Yields 61 ligands and receptors to evaluate</span></span>
+<span id="cb35-2"><a href="#cb35-2"></a></span>
+<span id="cb35-3"><a href="#cb35-3"></a><span class="co">#Filter ramilowski pairs</span></span>
+<span id="cb35-4"><a href="#cb35-4"></a></span>
+<span id="cb35-5"><a href="#cb35-5"></a>interactions.forward1 &lt;-<span class="st"> </span>ramilowski_pairs[<span class="kw"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(ramilowski_pairs<span class="op">$</span>ligand) <span class="op">%in%</span><span class="st"> </span>ligs.recs.use,]</span>
+<span id="cb35-6"><a href="#cb35-6"></a>interactions.forward2 &lt;-<span class="st"> </span>ramilowski_pairs[<span class="kw"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(ramilowski_pairs<span class="op">$</span>receptor) <span class="op">%in%</span><span class="st"> </span>ligs.recs.use,]</span>
+<span id="cb35-7"><a href="#cb35-7"></a>interact.for &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span>(interactions.forward1,interactions.forward2)</span>
+<span id="cb35-8"><a href="#cb35-8"></a><span class="kw"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(interact.for)</span></code></pre></div>
+<pre><code>## [1] 241   3</code></pre>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a><span class="co">#Yields 241 ligand and receptor interactions to evaluate</span></span>
+<span id="cb37-2"><a href="#cb37-2"></a></span>
+<span id="cb37-3"><a href="#cb37-3"></a><span class="co">#Create data for celltalker</span></span>
+<span id="cb37-4"><a href="#cb37-4"></a></span>
+<span id="cb37-5"><a href="#cb37-5"></a>expr.mat &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/Seurat/man/GetAssayData.html">GetAssayData</a></span>(ser.obj,<span class="dt">slot=</span><span class="st">"counts"</span>)</span>
+<span id="cb37-6"><a href="#cb37-6"></a>defined.clusters &lt;-<span class="st"> </span>ser.obj<span class="op">@</span>meta.data<span class="op">$</span>cell.types</span>
+<span id="cb37-7"><a href="#cb37-7"></a>defined.groups &lt;-<span class="st"> </span>ser.obj<span class="op">@</span>meta.data<span class="op">$</span>sample.type</span>
+<span id="cb37-8"><a href="#cb37-8"></a>defined.replicates &lt;-<span class="st"> </span>ser.obj<span class="op">@</span>meta.data<span class="op">$</span>sample.id</span>
+<span id="cb37-9"><a href="#cb37-9"></a></span>
+<span id="cb37-10"><a href="#cb37-10"></a>reshaped.matrices &lt;-<span class="st"> </span><span class="kw"><a href="../reference/reshape_matrices.html">reshape_matrices</a></span>(<span class="dt">count.matrix=</span>expr.mat,<span class="dt">clusters=</span>defined.clusters,<span class="dt">groups=</span>defined.groups,<span class="dt">replicates=</span>defined.replicates,<span class="dt">ligands.and.receptors=</span>interact.for)</span>
+<span id="cb37-11"><a href="#cb37-11"></a></span>
+<span id="cb37-12"><a href="#cb37-12"></a><span class="co">#Check out the hierarchy of the tibble</span></span>
+<span id="cb37-13"><a href="#cb37-13"></a>reshaped.matrices</span></code></pre></div>
+<pre><code>## # A tibble: 2 x 2
+##   group  samples         
+##   &lt;chr&gt;  &lt;list&gt;          
+## 1 pbmc   &lt;tibble [3 × 2]&gt;
+## 2 tonsil &lt;tibble [3 × 2]&gt;</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a><span class="kw">unnest</span>(reshaped.matrices,<span class="dt">cols=</span><span class="st">"samples"</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 6 x 3
+##   group  sample   expr.matrices   
+##   &lt;chr&gt;  &lt;chr&gt;    &lt;list&gt;          
+## 1 pbmc   pbmc_1   &lt;named list [8]&gt;
+## 2 pbmc   pbmc_2   &lt;named list [8]&gt;
+## 3 pbmc   pbmc_3   &lt;named list [8]&gt;
+## 4 tonsil tonsil_1 &lt;named list [8]&gt;
+## 5 tonsil tonsil_2 &lt;named list [8]&gt;
+## 6 tonsil tonsil_3 &lt;named list [8]&gt;</code></pre>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">pull</span>(<span class="kw">unnest</span>(reshaped.matrices,<span class="dt">cols=</span><span class="st">"samples"</span>))[[<span class="dv">1</span>]])</span></code></pre></div>
+<pre><code>## [1] "b.cells"        "cd14.monocytes" "cd16.monocytes" "cd4.tconv"     
+## [5] "cd8.cells"      "nk.cells"       "pdc"            "plasma.cells"</code></pre>
+<p>What we have done in this initial step is to separate our overall expression matrix into a series of individual expression matrices from each sample. An overview of the resulting tibble is as follows:</p>
+<p>2-column tibble containing group and samples - “samples” column from the top-level contains 3-column tibble - “expr.matrices” from above is a list of count matrices from each cluster of an individual replicate (in this case, clusters are the cell types)</p>
+<p>Next, we can create a tibble of consistently expressed ligands and receptors for each group using the create_lig_rec_tib function.</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a>consistent.lig.recs &lt;-<span class="st"> </span><span class="kw"><a href="../reference/create_lig_rec_tib.html">create_lig_rec_tib</a></span>(<span class="dt">exp.tib=</span>reshaped.matrices,<span class="dt">clusters=</span>defined.clusters,<span class="dt">groups=</span>defined.groups,<span class="dt">replicates=</span>defined.replicates,<span class="dt">cells.reqd=</span><span class="dv">10</span>,<span class="dt">freq.pos.reqd=</span><span class="fl">0.5</span>,<span class="dt">ligands.and.receptors=</span>interact.for)</span>
+<span id="cb43-2"><a href="#cb43-2"></a></span>
+<span id="cb43-3"><a href="#cb43-3"></a>consistent.lig.recs</span></code></pre></div>
+<pre><code>## # A tibble: 2 x 2
+##   group  lig.rec.exp     
+##   &lt;chr&gt;  &lt;list&gt;          
+## 1 pbmc   &lt;tibble [8 × 2]&gt;
+## 2 tonsil &lt;tibble [8 × 2]&gt;</code></pre>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a><span class="kw">unnest</span>(consistent.lig.recs[<span class="dv">1</span>,<span class="dv">2</span>],<span class="dt">cols=</span><span class="st">"lig.rec.exp"</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 8 x 2
+##   cluster.id     ligands.and.receptors
+##   &lt;chr&gt;          &lt;named list&gt;         
+## 1 b.cells        &lt;named list [2]&gt;     
+## 2 cd14.monocytes &lt;named list [2]&gt;     
+## 3 cd16.monocytes &lt;named list [2]&gt;     
+## 4 cd4.tconv      &lt;named list [2]&gt;     
+## 5 cd8.cells      &lt;named list [2]&gt;     
+## 6 nk.cells       &lt;named list [2]&gt;     
+## 7 pdc            &lt;named list [2]&gt;     
+## 8 plasma.cells   &lt;named list [2]&gt;</code></pre>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1"></a><span class="kw">pull</span>(<span class="kw">unnest</span>(consistent.lig.recs[<span class="dv">1</span>,<span class="dv">2</span>],<span class="dt">cols=</span><span class="st">"lig.rec.exp"</span>)[<span class="dv">1</span>,<span class="dv">2</span>])[[<span class="dv">1</span>]]</span></code></pre></div>
+<pre><code>## $ligands
+##  [1] "S100A9"   "S100A8"   "IL1B"     "FN1"      "BTLA"     "SPON2"   
+##  [7] "LRPAP1"   "VCAN"     "CD14"     "LY86"     "HLA-G"    "HLA-A"   
+## [13] "HLA-E"    "HLA-B"    "LTB"      "HSPA1A"   "CD24"     "NAMPT"   
+## [19] "TIMP1"    "CD40LG"   "ADAM28"   "PNOC"     "IL7"      "ANXA1"   
+## [25] "SEMA4D"   "VIM"      "PSAP"     "LYZ"      "SELPLG"   "HMGB1"   
+## [31] "TNFSF13B" "GZMB"     "CALM1"    "SERPINA1" "HSP90AA1" "B2M"     
+## [37] "PKM"      "IL16"     "CCL5"     "CCL3"     "ICAM2"    "CD70"    
+## [43] "ICAM1"    "ICAM3"    "TGFB1"    "FLT3LG"   "APP"     
+## 
+## $receptors
+##  [1] "CSF3R"     "TGFBR3"    "KCNA3"     "CD53"      "CD1A"      "CD247"    
+##  [7] "SELL"      "CXCR4"     "ITGA4"     "GRM7"      "TGFBR2"    "CCR5"     
+## [13] "TFRC"      "TLR1"      "IL7R"      "CD180"     "ADRB2"     "CD74"     
+## [19] "HMMR"      "HLA-F"     "KCNQ5"     "IGF2R"     "CCR6"      "CD36"     
+## [25] "CXCR3"     "PGRMC1"    "CD72"      "TGFBR1"    "ABCA1"     "IFITM1"   
+## [31] "CD81"      "KCNQ1"     "CD44"      "CD82"      "IL10RA"    "CD3D"     
+## [37] "CD3G"      "CXCR5"     "SORL1"     "APLP2"     "ITGB1"     "FAS"      
+## [43] "CD27"      "CD4"       "KLRG1"     "CLEC2B"    "KLRD1"     "KLRC1"    
+## [49] "PDE1B"     "CD63"      "TNFRSF17"  "CD19"      "ITGAL"     "ITGAM"    
+## [55] "TNFRSF13B" "ERBB2"     "PTPRA"     "CD40"      "OPRL1"     "INSR"     
+## [61] "TYROBP"    "CD79A"     "KCNN4"     "FPR2"      "LILRB2"    "LILRB1"   
+## [67] "KIR2DL3"   "KIR2DL1"   "KIR3DL2"   "TNFRSF13C" "CELSR1"    "ITGB2"</code></pre>
+<p>We can see that we have now recovered a list of consistently expressed ligands and receptors from each cluster in each experimental group, based on the criteria specified above (i.e. at least 10 cells in each cluster express the ligand/receptor and at least 50% of replicates in a group express the ligand/receptor). Functionally, since we only have 2 replicates in each group here, we require all replicate to express the ligand/receptor to count it as consistently expressed.</p>
 </div>
 <div id="determine-putative-ligandreceptor-pairs" class="section level1">
 <h1 class="hasAnchor">
 <a href="#determine-putative-ligandreceptor-pairs" class="anchor"></a>Determine putative ligand/receptor pairs</h1>
-<p>Now that we have consistently expressed ligands and receptors, we will look for interactions (as defined in ramilowski_pairs$pair) within and between clusters in a given group.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">interactions &lt;-<span class="st"> </span><span class="kw"><a href="../reference/putative_interactions.html">putative_interactions</a></span>(<span class="dt">ligand.receptor.tibble=</span>consistent.lig.recs,<span class="dt">clusters=</span>defined.clusters,<span class="dt">groups=</span>defined.groups,<span class="dt">freq.group.in.cluster=</span><span class="fl">0.1</span>,<span class="dt">ligands.and.receptors=</span>ramilowski_pairs)</a>
-<a class="sourceLine" id="cb27-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb27-3" data-line-number="3">interactions</a></code></pre></div>
-<pre><code>## # A tibble: 2 x 2
-##   name  value               
-##   &lt;chr&gt; &lt;list&gt;              
-## 1 MALT  &lt;named list [2,557]&gt;
-## 2 PBMC  &lt;named list [2,557]&gt;</code></pre>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="kw">pull</span>(interactions[<span class="dv">2</span>,<span class="dv">2</span>])[[<span class="dv">1</span>]][<span class="dv">11</span>]</a></code></pre></div>
-<pre><code>## $ADAM15_ITGA5
-## $ADAM15_ITGA5$ligand.cells
-##  [1] "MALT_CD4_2"   "MALT_Tumor_1" "PBMC_B_cell"  "PBMC_CD14_1" 
-##  [5] "PBMC_CD14_2"  "PBMC_CD4_1"   "PBMC_CD4_2"   "PBMC_CD8_1"  
-##  [9] "PBMC_NK_1"    "PBMC_NK_2"   
-## 
-## $ADAM15_ITGA5$receptor.cells
-##  [1] "MALT_CD4_2"   "MALT_Tumor_1" "PBMC_B_cell"  "PBMC_CD14_1" 
-##  [5] "PBMC_CD14_2"  "PBMC_CD4_1"   "PBMC_CD4_2"   "PBMC_CD8_1"  
-##  [9] "PBMC_NK_1"    "PBMC_NK_2"</code></pre>
-<p>Here, the nested tibble only contains the sample groups and a list of ligand/receptor pairs for each group along with the clusters that particpate in the ligand/receptor interactions.</p>
+<p>Now that we have consistently expressed ligands and receptors, we will look for interactions (as defined in ramilowski_pairs$pair) within and between clusters in a given group. The parameter “freq.group.in.cluster” allows us to only examine clusters that consist of (in this case) &gt;5% of cells from a given group for interactions.</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1"></a>put.int &lt;-<span class="st"> </span><span class="kw"><a href="../reference/putative_interactions.html">putative_interactions</a></span>(<span class="dt">ligand.receptor.tibble=</span>consistent.lig.recs,<span class="dt">clusters=</span>defined.clusters,<span class="dt">groups=</span>defined.groups,<span class="dt">freq.group.in.cluster=</span><span class="fl">0.05</span>,<span class="dt">ligands.and.receptors=</span>interact.for)</span></code></pre></div>
+<pre><code>## Warning: `cols` is now required.
+## Please use `cols = c(lig.rec.exp)`
+
+## Warning: `cols` is now required.
+## Please use `cols = c(lig.rec.exp)`</code></pre>
+<p>Here, the nested tibble contains the sample groups and a list of ligand/receptor pairs for each group along with the clusters that particpate in the ligand/receptor interactions.</p>
 </div>
-<div id="unique-ligandreceptor-pairs-in-a-group" class="section level1">
+<div id="identifying-and-visualizing-unique-ligandreceptor-pairs-in-a-group" class="section level1">
 <h1 class="hasAnchor">
-<a href="#unique-ligandreceptor-pairs-in-a-group" class="anchor"></a>Unique ligand/receptor pairs in a group</h1>
-<p>Now that we have our lists of ligand/receptor interactions, we can investigate which one are unique to each group. We do this with the unique_interactions function.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">unique.int &lt;-<span class="st"> </span><span class="kw"><a href="../reference/unique_interactions.html">unique_interactions</a></span>(<span class="dt">putative.interactions.tib=</span>interactions,<span class="dt">group1=</span><span class="st">"MALT"</span>,<span class="dt">group2=</span><span class="st">"PBMC"</span>,<span class="dt">ligands.and.receptors=</span>ramilowski_pairs)</a>
-<a class="sourceLine" id="cb31-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb31-3" data-line-number="3">unique.int</a></code></pre></div>
-<pre><code>## # A tibble: 3 x 2
-##   comparison ligands.and.receptors
-##   &lt;chr&gt;      &lt;list&gt;               
-## 1 unique1v2  &lt;chr [8]&gt;            
-## 2 unique2v1  &lt;chr [2]&gt;            
-## 3 common     &lt;chr [236]&gt;</code></pre>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1"><span class="kw">unnest</span>(unique.int[<span class="dv">1</span>,<span class="dv">2</span>])</a></code></pre></div>
-<pre><code>## # A tibble: 8 x 1
-##   ligands.and.receptors
-##   &lt;chr&gt;                
-## 1 CXCL13_CCR10         
-## 2 CXCL13_CXCR3         
-## 3 CXCL13_CXCR5         
-## 4 LTF_LRP1             
-## 5 LTF_TFRC             
-## 6 MMP7_CD151           
-## 7 MMP7_CD44            
-## 8 SLPI_CD4</code></pre>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1"><span class="kw">unnest</span>(unique.int[<span class="dv">2</span>,<span class="dv">2</span>])</a></code></pre></div>
-<pre><code>## # A tibble: 2 x 1
-##   ligands.and.receptors
-##   &lt;chr&gt;                
-## 1 RNASE2_TLR2          
-## 2 S100A8_TLR4</code></pre>
-<p>As you can see here, there are a some ligand and receptor interactions that are only expressed in the MALT, as well as some that are only expressed in PBMC. We can create a quick heatmap to visualize these interactions.</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="co">#Pull the unique ligands and receptors from the MALT group</span></a>
-<a class="sourceLine" id="cb37-2" data-line-number="2">group1.unique &lt;-<span class="st"> </span><span class="kw">unnest</span>(unique.int[<span class="dv">1</span>,<span class="dv">2</span>]) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pull</span>()</a>
-<a class="sourceLine" id="cb37-3" data-line-number="3">group1.lig &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">sapply</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/strsplit">strsplit</a></span>(group1.unique,<span class="dt">split=</span><span class="st">"_"</span>),<span class="cf">function</span>(x) x[[<span class="dv">1</span>]]))</a>
-<a class="sourceLine" id="cb37-4" data-line-number="4">group1.rec &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">sapply</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/strsplit">strsplit</a></span>(group1.unique,<span class="dt">split=</span><span class="st">"_"</span>),<span class="cf">function</span>(x) x[[<span class="dv">2</span>]]))</a>
-<a class="sourceLine" id="cb37-5" data-line-number="5">ligs.recs &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/igraph/topics/union">union</a></span>(group1.lig,group1.rec)</a>
-<a class="sourceLine" id="cb37-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb37-7" data-line-number="7"><span class="co">#Pull the expression data, scale, and clip the scaling above and below 2 and -2, respectively</span></a>
-<a class="sourceLine" id="cb37-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb37-9" data-line-number="9">cell.order &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(ser<span class="op">@</span>cell.names[ser<span class="op">@</span>meta.data<span class="op">$</span>sample.group<span class="op">==</span><span class="st">"PBMC"</span>],ser<span class="op">@</span>cell.names[ser<span class="op">@</span>meta.data<span class="op">$</span>sample.group<span class="op">==</span><span class="st">"MALT"</span>])</a>
-<a class="sourceLine" id="cb37-10" data-line-number="10">mat &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">as.matrix</a></span>(ser<span class="op">@</span>data[ligs.recs,cell.order])</a>
-<a class="sourceLine" id="cb37-11" data-line-number="11">cols &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"red"</span>,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/table">table</a></span>(ser<span class="op">@</span>meta.data<span class="op">$</span>sample.group)[<span class="dv">2</span>]),<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"blue"</span>,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/table">table</a></span>(ser<span class="op">@</span>meta.data<span class="op">$</span>sample.group)[<span class="dv">1</span>]))</a>
-<a class="sourceLine" id="cb37-12" data-line-number="12">mat.scaled &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/apply">apply</a></span>(mat,<span class="dv">1</span>,scale))</a>
-<a class="sourceLine" id="cb37-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb37-14" data-line-number="14"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(mat.scaled)) {</a>
-<a class="sourceLine" id="cb37-15" data-line-number="15">  sub &lt;-<span class="st"> </span>mat.scaled[i,]</a>
-<a class="sourceLine" id="cb37-16" data-line-number="16">  sub[sub<span class="op">&gt;</span><span class="dv">2</span>] &lt;-<span class="st"> </span><span class="dv">2</span></a>
-<a class="sourceLine" id="cb37-17" data-line-number="17">  sub[sub<span class="op">&lt;</span><span class="st"> </span><span class="dv">-2</span>] &lt;-<span class="st"> </span><span class="dv">-2</span></a>
-<a class="sourceLine" id="cb37-18" data-line-number="18">  mat.scaled[i,] &lt;-<span class="st"> </span>sub</a>
-<a class="sourceLine" id="cb37-19" data-line-number="19">}</a>
-<a class="sourceLine" id="cb37-20" data-line-number="20"></a>
-<a class="sourceLine" id="cb37-21" data-line-number="21"><span class="co">#Use heatmap3 to generate a heatmap</span></a>
-<a class="sourceLine" id="cb37-22" data-line-number="22"></a>
-<a class="sourceLine" id="cb37-23" data-line-number="23"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(heatmap3)</a>
-<a class="sourceLine" id="cb37-24" data-line-number="24"></a>
-<a class="sourceLine" id="cb37-25" data-line-number="25"><span class="kw"><a href="https://www.rdocumentation.org/packages/heatmap3/topics/heatmap3">heatmap3</a></span>(mat.scaled,<span class="dt">scale=</span><span class="st">"none"</span>,<span class="dt">Colv=</span><span class="ot">NA</span>,<span class="dt">ColSideColors=</span>cols,<span class="dt">ColSideLab=</span><span class="ot">NA</span>,<span class="dt">labCol=</span><span class="ot">NA</span>,<span class="dt">cex=</span><span class="dv">1</span>,<span class="dt">cexRow=</span><span class="fl">1.5</span>)</a>
-<a class="sourceLine" id="cb37-26" data-line-number="26"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/legend">legend</a></span>(<span class="st">"topright"</span>,<span class="dt">legend=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"PBMC"</span>,<span class="st">"MALT"</span>),<span class="dt">fill=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"red"</span>,<span class="st">"blue"</span>),<span class="dt">ncol=</span><span class="dv">1</span>,<span class="dt">bty=</span><span class="st">"n"</span>)</a></code></pre></div>
-<p><img src="celltalker_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;"></p>
-<p>Here, we can see that there are unique ligand/receptor interactions present in the MALT tumor that are not present in PBMC, and visa versa. One good example is the CXCL13_CXCR5 ligand receptor interaction that is specific to the MALT group. There are also many interactions that are common between the two (236, to be specific). We explore below how these interactions can be uniquely associated with clusters, and how networks of interactions across clusters can shift between sample types.</p>
-</div>
-<div id="differences-in-clusters-expressing-ligandsreceptors-between-groups" class="section level1">
-<h1 class="hasAnchor">
-<a href="#differences-in-clusters-expressing-ligandsreceptors-between-groups" class="anchor"></a>Differences in clusters expressing ligands/receptors between groups</h1>
-<p>We can use the function diff_interactions to explore either ligands or receptors that participate in a ligand/receptor interaction and are uniquely expressed in a given cluster. For example, the function below looks for unique ligands that are expressed by the CD8 cells from the MALT group versus the PBMC group.</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1">malt.cd8.diff &lt;-<span class="st"> </span><span class="kw"><a href="../reference/diff_interactions.html">diff_interactions</a></span>(<span class="dt">putative.interactions.tib=</span>interactions,<span class="dt">group1=</span><span class="st">"MALT"</span>,<span class="dt">group2=</span><span class="st">"PBMC"</span>,<span class="dt">cluster=</span><span class="st">"MALT_CD8_1"</span>,<span class="dt">search.ligand=</span><span class="ot">TRUE</span>,<span class="dt">search.receptor=</span><span class="ot">FALSE</span>,<span class="dt">ligands.and.receptors=</span>ramilowski_pairs)</a>
-<a class="sourceLine" id="cb38-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb38-3" data-line-number="3"><span class="kw">pull</span>(malt.cd8.diff[<span class="dv">1</span>,<span class="dv">2</span>])[[<span class="dv">1</span>]]</a></code></pre></div>
-<pre><code>##   [1] "ADAM17_ITGA5"       "ADAM17_ITGB1"       "ADAM17_NOTCH1"     
-##   [4] "ADAM28_ITGA4"       "ADAM9_ITGA6"        "ADAM9_ITGAV"       
-##   [7] "ADAM9_ITGB1"        "ALOX5AP_ALOX5"      "ANXA1_FPR1"        
-##  [10] "APP_CAV1"           "APP_CD74"           "APP_LRP1"          
-##  [13] "APP_NCSTN"          "ARF1_INSR"          "B2M_CD247"         
-##  [16] "B2M_CD3D"           "B2M_CD3G"           "B2M_HLA-F"         
-##  [19] "B2M_KLRC1"          "B2M_KLRD1"          "B2M_LILRB1"        
-##  [22] "B2M_LILRB2"         "B2M_TFRC"           "BTLA_CD247"        
-##  [25] "BTLA_CD79A"         "BTLA_TNFRSF14"      "CALM1_FAS"         
-##  [28] "CALM1_INSR"         "CALM1_KCNN4"        "CALM1_KCNQ1"       
-##  [31] "CALM1_PTPRA"        "CALM1_SELL"         "CALM1_VIPR1"       
-##  [34] "CALM2_INSR"         "CALM2_KCNQ1"        "CALM2_SELL"        
-##  [37] "CALM3_INSR"         "CALM3_KCNQ1"        "CALM3_SELL"        
-##  [40] "CALR_HLA-F"         "CALR_ITGAV"         "CALR_LRP1"         
-##  [43] "CCL20_CCR6"         "CCL20_CXCR3"        "CCL3L1_CCR1"       
-##  [46] "CCL3_CCR1"          "CCL4_CCR1"          "CCL5_CCR1"         
-##  [49] "CCL5_CXCR3"         "CCL5_SDC4"          "CD40LG_CD40"       
-##  [52] "CD40LG_ITGAM"       "CD40LG_ITGB2"       "CD40LG_TRAF3"      
-##  [55] "CD55_CR1"           "CD70_CD27"          "COL6A2_ITGB1"      
-##  [58] "CXCL13_CCR10"       "CXCL13_CXCR3"       "CXCL13_CXCR5"      
-##  [61] "DUSP18_CD151"       "DUSP18_ITGA6"       "DUSP18_ITGB1"      
-##  [64] "DUSP18_RPSA"        "FARP2_PLXNA3"       "FLT3LG_FLT3"       
-##  [67] "GNAI2_ADCY7"        "GNAI2_C5AR1"        "GNAI2_CAV1"        
-##  [70] "GNAI2_CXCR3"        "GNAI2_F2R"          "GNAI2_FPR1"        
-##  [73] "GNAI2_S1PR1"        "GNAI2_S1PR4"        "GNAI2_S1PR5"       
-##  [76] "GNAS_ADCY7"         "GNAS_PTGDR"         "GNAS_PTGIR"        
-##  [79] "GNAS_VIPR1"         "GPI_AMFR"           "GSTP1_TRAF2"       
-##  [82] "GZMB_IGF2R"         "GZMB_PGRMC1"        "HLA-A_APLP2"       
-##  [85] "HLA-A_CD3D"         "HLA-A_CD3G"         "HLA-A_LILRB1"      
-##  [88] "HLA-A_LILRB2"       "HLA-B_CANX"         "HLA-B_CD3D"        
-##  [91] "HLA-B_CD3G"         "HLA-B_KLRD1"        "HLA-B_LILRB1"      
-##  [94] "HLA-B_LILRB2"       "HLA-C_CD3D"         "HLA-C_CD3G"        
-##  [97] "HLA-C_LILRB1"       "HLA-C_LILRB2"       "HLA-E_KLRC1"       
-## [100] "HLA-E_KLRD1"        "HMGB1_THBD"         "HRAS_CAV1"         
-## [103] "HRAS_INSR"          "HRAS_TLR2"          "HSP90B1_ASGR1"     
-## [106] "HSP90B1_LRP1"       "HSP90B1_TLR1"       "HSP90B1_TLR2"      
-## [109] "HSP90B1_TLR4"       "HSPA1A_TLR4"        "ICAM1_CAV1"        
-## [112] "ICAM1_IL2RA"        "ICAM1_IL2RG"        "ICAM1_ITGAL"       
-## [115] "ICAM1_ITGAM"        "ICAM1_ITGAX"        "ICAM1_ITGB2"       
-## [118] "ICAM2_ITGAL"        "ICAM2_ITGAM"        "ICAM2_ITGB2"       
-## [121] "ICAM3_ITGAL"        "ICAM3_ITGB2"        "IFNG_IFNGR1"       
-## [124] "IFNG_IFNGR2"        "IL10_IL10RA"        "IL10_SIRPG"        
-## [127] "IL15_IL2RA"         "IL15_IL2RB"         "IL15_IL2RG"        
-## [130] "IL16_CD4"           "IL1B_ADRB2"         "IL23A_IL12RB1"     
-## [133] "IL6_IL6R"           "IL6_IL6ST"          "LGALS3BP_ITGB1"    
-## [136] "LRPAP1_LDLR"        "LRPAP1_LRP1"        "LRPAP1_SORL1"      
-## [139] "LRPAP1_SORT1"       "LTB_CD40"           "LTB_LTBR"          
-## [142] "LTB_TNFRSF1A"       "LY86_CD180"         "LYZ_ITGAL"         
-## [145] "MFGE8_ITGAV"        "MFNG_NOTCH1"        "MFNG_NOTCH2"       
-## [148] "MMP9_CD44"          "MMP9_ITGAM"         "MMP9_ITGB2"        
-## [151] "MMP9_LRP1"          "NAMPT_INSR"         "NUCB2_ERAP1"       
-## [154] "OSM_IL6ST"          "PKM_CD44"           "PRSS23_TMEM222"    
-## [157] "PSAP_LRP1"          "PSAP_SORT1"         "PSEN1_CD44"        
-## [160] "PSEN1_NCSTN"        "PSEN1_NOTCH1"       "PSEN1_NOTCH2"      
-## [163] "PTDSS1_JMJD6"       "PTMA_VIPR1"         "RPS19_C5AR1"       
-## [166] "S100A9_TLR4"        "SELPLG_ITGAM"       "SELPLG_ITGB2"      
-## [169] "SELPLG_SELL"        "SEMA4A_PLXND1"      "SEMA4D_CD72"       
-## [172] "SEMA4D_PLXNB2"      "SEMA7A_ITGB1"       "SEMA7A_PLXNC1"     
-## [175] "SPON2_ITGAM"        "SPON2_ITGB2"        "TGFB1_CAV1"        
-## [178] "TGFB1_CXCR4"        "TGFB1_ENG"          "TGFB1_ITGAV"       
-## [181] "TGFB1_TGFBR1"       "TGFB1_TGFBR2"       "TGFB1_TGFBR3"      
-## [184] "TIMP1_CD63"         "TIMP2_ITGB1"        "TNFSF10_TNFRSF10A" 
-## [187] "TNFSF10_TNFRSF10B"  "TNFSF12_TNFRSF25"   "TNFSF13B_TNFRSF13B"
-## [190] "TNFSF13B_TNFRSF13C" "TNFSF13B_TNFRSF17"  "TNFSF9_TNFRSF9"    
-## [193] "TNFSF9_TRAF2"       "TNF_LTBR"           "TNF_TNFRSF1A"      
-## [196] "TNF_TNFRSF1B"       "TNF_TRAF2"          "UBA52_NOTCH1"      
-## [199] "UBA52_TGFBR1"       "UBA52_TGFBR2"       "VEGFA_ITGAV"       
-## [202] "VEGFA_ITGB1"        "VEGFA_SIRPA"        "VIM_CD44"          
-## [205] "ZG16B_CXCR4"        "ZG16B_TLR2"         "ZG16B_TLR4"</code></pre>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1"><span class="co">#We see that, among many other interctions, IFNG emerged as one that is potentially biologically interesting</span></a>
-<a class="sourceLine" id="cb40-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb40-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grep</a></span>(<span class="st">"IFN"</span>,<span class="kw">pull</span>(malt.cd8.diff[<span class="dv">1</span>,<span class="dv">2</span>])[[<span class="dv">1</span>]],<span class="dt">value=</span>T)</a></code></pre></div>
-<pre><code>## [1] "IFNG_IFNGR1" "IFNG_IFNGR2"</code></pre>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1"><span class="co">#Let's investigate interferon gamma and it's receptors in more detail - we will make a heatmap showing all the clusters and the expression pattern of IFNG and it's receptors IFNGR1 and IFNGR2</span></a>
-<a class="sourceLine" id="cb42-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb42-3" data-line-number="3"><span class="co">#Pull the log-normalized expression data and scale</span></a>
-<a class="sourceLine" id="cb42-4" data-line-number="4">mat &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">as.matrix</a></span>(ser<span class="op">@</span>data[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"IFNG"</span>,<span class="st">"IFNGR1"</span>,<span class="st">"IFNGR2"</span>),<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/order">order</a></span>(defined.clusters)])</a>
-<a class="sourceLine" id="cb42-5" data-line-number="5">mat.scaled &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/apply">apply</a></span>(mat,<span class="dv">1</span>,scale))</a>
-<a class="sourceLine" id="cb42-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb42-7" data-line-number="7"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(mat.scaled)) {</a>
-<a class="sourceLine" id="cb42-8" data-line-number="8">  sub &lt;-<span class="st"> </span>mat.scaled[i,]</a>
-<a class="sourceLine" id="cb42-9" data-line-number="9">  sub[sub<span class="op">&gt;</span><span class="dv">2</span>] &lt;-<span class="st"> </span><span class="dv">2</span></a>
-<a class="sourceLine" id="cb42-10" data-line-number="10">  sub[sub<span class="op">&lt;</span><span class="st"> </span><span class="dv">-2</span>] &lt;-<span class="st"> </span><span class="dv">-2</span></a>
-<a class="sourceLine" id="cb42-11" data-line-number="11">  mat.scaled[i,] &lt;-<span class="st"> </span>sub</a>
-<a class="sourceLine" id="cb42-12" data-line-number="12">}</a>
-<a class="sourceLine" id="cb42-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb42-14" data-line-number="14"><span class="co">#Use RColorBrewer to assign unique colors to each cluster</span></a>
-<a class="sourceLine" id="cb42-15" data-line-number="15"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(RColorBrewer)</a>
-<a class="sourceLine" id="cb42-16" data-line-number="16">col.length &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(defined.clusters))</a>
-<a class="sourceLine" id="cb42-17" data-line-number="17">color.function &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/grDevices/topics/colorRamp">colorRampPalette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/RColorBrewer/topics/ColorBrewer">brewer.pal</a></span>(<span class="dv">7</span>,<span class="st">"Set1"</span>))</a>
-<a class="sourceLine" id="cb42-18" data-line-number="18">cols &lt;-<span class="st"> </span><span class="kw">color.function</span>(<span class="dv">15</span>)</a>
-<a class="sourceLine" id="cb42-19" data-line-number="19"></a>
-<a class="sourceLine" id="cb42-20" data-line-number="20">cols.heat &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/factor">as.factor</a></span>(defined.clusters)</a>
-<a class="sourceLine" id="cb42-21" data-line-number="21">cols.heat &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/character">as.character</a></span>(<span class="kw">recode</span>(cols.heat,<span class="op">!!!</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/setNames">setNames</a></span>(cols,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/levels">levels</a></span>(cols.heat))))</a>
-<a class="sourceLine" id="cb42-22" data-line-number="22">cols.heat &lt;-<span class="st"> </span>cols.heat[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/order">order</a></span>(defined.clusters)]</a>
-<a class="sourceLine" id="cb42-23" data-line-number="23"></a>
-<a class="sourceLine" id="cb42-24" data-line-number="24"><span class="co">#Plot the heatmap and legend</span></a>
-<a class="sourceLine" id="cb42-25" data-line-number="25"><span class="kw"><a href="https://www.rdocumentation.org/packages/heatmap3/topics/heatmap3">heatmap3</a></span>(mat.scaled,<span class="dt">scale=</span><span class="st">"none"</span>,<span class="dt">Colv=</span><span class="ot">NA</span>,<span class="dt">ColSideColors=</span>cols.heat,<span class="dt">ColSideLab=</span><span class="ot">NA</span>,<span class="dt">labCol=</span><span class="ot">NA</span>,,<span class="dt">cex=</span><span class="dv">1</span>,<span class="dt">cexRow=</span><span class="fl">1.5</span>)</a>
-<a class="sourceLine" id="cb42-26" data-line-number="26"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/legend">legend</a></span>(<span class="st">"topright"</span>,<span class="dt">legend=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/levels">levels</a></span>(defined.clusters),<span class="dt">fill=</span>cols,<span class="dt">ncol=</span><span class="dv">1</span>,<span class="dt">bty=</span><span class="st">"n"</span>)</a></code></pre></div>
-<p><img src="celltalker_files/figure-html/unnamed-chunk-10-1.png" width="70%" style="display: block; margin: auto;"></p>
-<p>We can see that the MALT_CD8_1 cluster is a significant IFNG expressing cluster, and that other clusters within the MALT groups express the receptors IFNGR1 and IFNGR2. While the receptors are expressed in PBMC groups, the IFNG expression is infrequent and therefore doesn’t score as an interaction.</p>
-</div>
-<div id="differences-in-networks-between-groups" class="section level1">
-<h1 class="hasAnchor">
-<a href="#differences-in-networks-between-groups" class="anchor"></a>Differences in networks between groups</h1>
-<p>A final way that we will explore how interactions could differ by groups is by investigating shifts in networks of cell-cell communication. Formally, we can use graph theory to build sets of edges and nodes for all instances of specific ligand/receptor interactions within a group. We can then use these graphs to compare differences in the networks. This is facilitated through the diff_network function, which uses the igraph package for the network inference and some simple visualizations.</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1"><span class="co">#Pull the interactions that are common between the groups. We will look at the interaction between BTLA and TNFRSF14 as an example</span></a>
-<a class="sourceLine" id="cb43-2" data-line-number="2">common.int &lt;-<span class="st"> </span><span class="kw">unnest</span>(unique.int[<span class="dv">3</span>,<span class="dv">2</span>]) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pull</span>()</a>
-<a class="sourceLine" id="cb43-3" data-line-number="3">common.int[<span class="dv">33</span>]</a></code></pre></div>
-<pre><code>## [1] "BTLA_TNFRSF14"</code></pre>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1">btla4.tnfrsf14.diff &lt;-<span class="st"> </span><span class="kw"><a href="../reference/diff_network.html">diff_network</a></span>(<span class="dt">putative.interactions.tib=</span>interactions,<span class="dt">group1=</span><span class="st">"MALT"</span>,<span class="dt">group2=</span><span class="st">"PBMC"</span>,<span class="dt">interaction=</span><span class="st">"BTLA_TNFRSF14"</span>)</a>
-<a class="sourceLine" id="cb45-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb45-3" data-line-number="3"><span class="co">#Check out the tibble formed by the diff_network function</span></a>
-<a class="sourceLine" id="cb45-4" data-line-number="4">btla4.tnfrsf14.diff</a></code></pre></div>
-<pre><code>## # A tibble: 4 x 2
-##   name               value             
-##   &lt;chr&gt;              &lt;list&gt;            
-## 1 diff_group1v2      &lt;igraph&gt;          
-## 2 diff_group2v1      &lt;igraph&gt;          
-## 3 diff_edge_group1v2 &lt;chr[,2] [42 × 2]&gt;
-## 4 diff_edge_group2v1 &lt;chr[,2] [64 × 2]&gt;</code></pre>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1"><span class="co">#We can directly plot graphs of the differences in networks using the base R plot function on the first two rows of the tibble</span></a>
-<a class="sourceLine" id="cb47-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb47-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(<span class="kw">pull</span>(btla4.tnfrsf14.diff[<span class="dv">1</span>,<span class="dv">2</span>])[[<span class="dv">1</span>]],<span class="dt">main=</span><span class="st">"MALT vs PBMC Differences"</span>)</a>
-<a class="sourceLine" id="cb47-4" data-line-number="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(<span class="kw">pull</span>(btla4.tnfrsf14.diff[<span class="dv">2</span>,<span class="dv">2</span>])[[<span class="dv">1</span>]],<span class="dt">main=</span><span class="st">"PBMC vs MALT Differences"</span>)</a></code></pre></div>
-<p><img src="celltalker_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="co">#We can also view the differences in edges as a matrix using the last 2 rows of the tibble</span></a>
-<a class="sourceLine" id="cb48-2" data-line-number="2"><span class="kw">pull</span>(btla4.tnfrsf14.diff[<span class="dv">3</span>,<span class="dv">2</span>])[[<span class="dv">1</span>]]</a></code></pre></div>
-<pre><code>##       group1         group2        
-##  [1,] "MALT_CD4_2"   "MALT_Tumor_2"
-##  [2,] "MALT_CD4_2"   "MALT_Tumor_4"
-##  [3,] "MALT_CD4_2"   "MALT_Tumor_3"
-##  [4,] "MALT_CD4_2"   "MALT_CD8_1"  
-##  [5,] "MALT_CD4_2"   "MALT_CD4_1"  
-##  [6,] "MALT_Tumor_1" "MALT_Tumor_2"
-##  [7,] "MALT_Tumor_1" "MALT_Tumor_4"
-##  [8,] "MALT_Tumor_1" "MALT_Tumor_3"
-##  [9,] "MALT_Tumor_1" "MALT_CD8_1"  
-## [10,] "MALT_Tumor_1" "MALT_CD4_1"  
-## [11,] "MALT_CD4_1"   "MALT_Tumor_2"
-## [12,] "MALT_CD4_1"   "MALT_Tumor_4"
-## [13,] "MALT_CD4_1"   "MALT_Tumor_3"
-## [14,] "MALT_CD4_1"   "MALT_CD8_1"  
-## [15,] "MALT_CD4_1"   "MALT_CD4_1"  
-## [16,] "MALT_CD4_1"   "PBMC_CD4_1"  
-## [17,] "MALT_CD4_1"   "MALT_Tumor_1"
-## [18,] "MALT_CD4_1"   "MALT_CD4_2"  
-## [19,] "MALT_CD8_1"   "MALT_Tumor_2"
-## [20,] "MALT_CD8_1"   "MALT_Tumor_4"
-## [21,] "MALT_CD8_1"   "MALT_Tumor_3"
-## [22,] "MALT_CD8_1"   "MALT_CD8_1"  
-## [23,] "MALT_CD8_1"   "MALT_CD4_1"  
-## [24,] "MALT_CD8_1"   "PBMC_CD4_1"  
-## [25,] "MALT_CD8_1"   "MALT_Tumor_1"
-## [26,] "MALT_CD8_1"   "MALT_CD4_2"  
-## [27,] "MALT_Tumor_3" "MALT_Tumor_2"
-## [28,] "MALT_Tumor_3" "MALT_Tumor_4"
-## [29,] "MALT_Tumor_3" "MALT_Tumor_3"
-## [30,] "MALT_Tumor_3" "MALT_CD8_1"  
-## [31,] "MALT_Tumor_3" "MALT_CD4_1"  
-## [32,] "MALT_Tumor_3" "PBMC_CD4_1"  
-## [33,] "MALT_Tumor_3" "MALT_Tumor_1"
-## [34,] "MALT_Tumor_3" "MALT_CD4_2"  
-## [35,] "MALT_Tumor_4" "MALT_Tumor_2"
-## [36,] "MALT_Tumor_4" "MALT_Tumor_4"
-## [37,] "MALT_Tumor_4" "MALT_Tumor_3"
-## [38,] "MALT_Tumor_4" "MALT_CD8_1"  
-## [39,] "MALT_Tumor_4" "MALT_CD4_1"  
-## [40,] "MALT_Tumor_4" "PBMC_CD4_1"  
-## [41,] "MALT_Tumor_4" "MALT_Tumor_1"
-## [42,] "MALT_Tumor_4" "MALT_CD4_2"</code></pre>
-<p>We can beautify these network plots using geomnet (an add-on to ggplot2 for network plotting).</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1">diff.edges &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="kw">pull</span>(btla4.tnfrsf14.diff[<span class="dv">3</span>,<span class="dv">2</span>])[[<span class="dv">1</span>]])</a>
-<a class="sourceLine" id="cb50-2" data-line-number="2">diff.edges[] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(diff.edges,as.character)</a>
-<a class="sourceLine" id="cb50-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb50-4" data-line-number="4"><span class="co">#We need to have all of the unique edges listed in column 1 (even if they don't have intereactions) for geomenet to work properly - so we add them</span></a>
-<a class="sourceLine" id="cb50-5" data-line-number="5">diff.edges.diff &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sets">setdiff</a></span>(diff.edges[,<span class="dv">2</span>],diff.edges[,<span class="dv">1</span>])</a>
-<a class="sourceLine" id="cb50-6" data-line-number="6"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(diff.edges.diff)) {</a>
-<a class="sourceLine" id="cb50-7" data-line-number="7">    diff.edges[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(diff.edges)<span class="op">+</span><span class="dv">1</span>,<span class="dv">1</span>] &lt;-<span class="st"> </span>diff.edges.diff[i]</a>
-<a class="sourceLine" id="cb50-8" data-line-number="8">    diff.edges[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(diff.edges),<span class="dv">2</span>] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
-<a class="sourceLine" id="cb50-9" data-line-number="9">}</a>
-<a class="sourceLine" id="cb50-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb50-11" data-line-number="11"><span class="co">#Create pull colors to use from our last heatmap</span></a>
-<a class="sourceLine" id="cb50-12" data-line-number="12">net.cols &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/levels">levels</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/factor">as.factor</a></span>(cols.heat))</a>
-<a class="sourceLine" id="cb50-13" data-line-number="13"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(net.cols) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/levels">levels</a></span>(diff.edges[,<span class="dv">1</span>])</a>
-<a class="sourceLine" id="cb50-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb50-15" data-line-number="15"><span class="kw">ggplot</span>(<span class="dt">data=</span>diff.edges,<span class="kw">aes</span>(<span class="dt">from_id=</span>group1,<span class="dt">to_id=</span>group2)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb50-16" data-line-number="16"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/geomnet/topics/geom_net">geom_net</a></span>(<span class="kw">aes</span>(<span class="dt">colour=</span>group1),<span class="dt">labelon=</span><span class="ot">FALSE</span>,<span class="dt">directed=</span><span class="ot">TRUE</span>,<span class="dt">vjust=</span><span class="fl">0.5</span>,<span class="dt">size=</span><span class="dv">15</span>,<span class="dt">arrowsize=</span><span class="dv">1</span>,<span class="dt">linewidth=</span><span class="fl">0.5</span>,<span class="dt">arrowgap=</span><span class="fl">0.1</span>,<span class="dt">selfloops=</span><span class="ot">TRUE</span>,<span class="dt">ecolour=</span><span class="st">"grey40"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb50-17" data-line-number="17"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/geomnet/topics/theme_net">theme_net</a></span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb50-18" data-line-number="18"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position=</span><span class="st">"bottom"</span>,<span class="dt">legend.title=</span><span class="kw">element_blank</span>()) <span class="op">+</span></a>
-<a class="sourceLine" id="cb50-19" data-line-number="19"><span class="st">  </span><span class="kw">scale_colour_manual</span>(<span class="dt">values=</span>net.cols)</a></code></pre></div>
-<p><img src="celltalker_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;"></p>
+<a href="#identifying-and-visualizing-unique-ligandreceptor-pairs-in-a-group" class="anchor"></a>Identifying and visualizing unique ligand/receptor pairs in a group</h1>
+<p>Now that we have our lists of ligand/receptor interactions, we can investigate which one are unique to each group (using the unique_interactions function) and plot the results (using the circos_plot function) to visualize the differences between groups.</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1"></a><span class="co">#Identify unique ligand/receptor interactions present in each sample</span></span>
+<span id="cb51-2"><a href="#cb51-2"></a>unique.ints &lt;-<span class="st"> </span><span class="kw"><a href="../reference/unique_interactions.html">unique_interactions</a></span>(put.int,<span class="dt">group1=</span><span class="st">"pbmc"</span>,<span class="dt">group2=</span><span class="st">"tonsil"</span>,interact.for)</span>
+<span id="cb51-3"><a href="#cb51-3"></a></span>
+<span id="cb51-4"><a href="#cb51-4"></a><span class="co">#Get data to plot circos for PBMC</span></span>
+<span id="cb51-5"><a href="#cb51-5"></a>pbmc.to.plot &lt;-<span class="st"> </span><span class="kw">pull</span>(unique.ints[<span class="dv">1</span>,<span class="dv">2</span>])[[<span class="dv">1</span>]]</span>
+<span id="cb51-6"><a href="#cb51-6"></a>for.circos.pbmc &lt;-<span class="st"> </span><span class="kw">pull</span>(put.int[<span class="dv">1</span>,<span class="dv">2</span>])[[<span class="dv">1</span>]][pbmc.to.plot]</span>
+<span id="cb51-7"><a href="#cb51-7"></a></span>
+<span id="cb51-8"><a href="#cb51-8"></a><span class="kw"><a href="../reference/circos_plot.html">circos_plot</a></span>(<span class="dt">interactions=</span>for.circos.pbmc,<span class="dt">clusters=</span>defined.clusters)</span></code></pre></div>
+<pre><code>## Note: 1 point is out of plotting region in sector 'b.cells', track '1'.</code></pre>
+<pre><code>## Note: 1 point is out of plotting region in sector 'cd14.monocytes',
+## track '1'.</code></pre>
+<pre><code>## Note: 1 point is out of plotting region in sector 'cd16.monocytes',
+## track '1'.</code></pre>
+<pre><code>## Note: 1 point is out of plotting region in sector 'cd4.tconv', track
+## '1'.</code></pre>
+<pre><code>## Note: 1 point is out of plotting region in sector 'cd8.cells', track
+## '1'.</code></pre>
+<pre><code>## Note: 1 point is out of plotting region in sector 'nk.cells', track
+## '1'.</code></pre>
+<pre><code>## Note: 1 point is out of plotting region in sector 'pdc', track '1'.</code></pre>
+<pre><code>## Note: 1 point is out of plotting region in sector 'plasma.cells', track
+## '1'.</code></pre>
+<p><img src="celltalker_files/figure-html/unnamed-chunk-9-1.png" width="960" style="display: block; margin: auto;"></p>
+<pre><code>## [1] "Plotted interactions"</code></pre>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1"></a><span class="co">#Get data to plot circos for tonsil</span></span>
+<span id="cb61-2"><a href="#cb61-2"></a>tonsil.to.plot &lt;-<span class="st"> </span><span class="kw">pull</span>(unique.ints[<span class="dv">2</span>,<span class="dv">2</span>])[[<span class="dv">1</span>]]</span>
+<span id="cb61-3"><a href="#cb61-3"></a>for.circos.tonsil &lt;-<span class="st"> </span><span class="kw">pull</span>(put.int[<span class="dv">2</span>,<span class="dv">2</span>])[[<span class="dv">1</span>]][tonsil.to.plot]</span>
+<span id="cb61-4"><a href="#cb61-4"></a></span>
+<span id="cb61-5"><a href="#cb61-5"></a><span class="kw"><a href="../reference/circos_plot.html">circos_plot</a></span>(<span class="dt">interactions=</span>for.circos.tonsil,<span class="dt">clusters=</span>defined.clusters)</span></code></pre></div>
+<pre><code>## Note: 1 point is out of plotting region in sector 'b.cells', track '1'.</code></pre>
+<pre><code>## Note: 1 point is out of plotting region in sector 'cd14.monocytes',
+## track '1'.</code></pre>
+<pre><code>## Note: 1 point is out of plotting region in sector 'cd16.monocytes',
+## track '1'.</code></pre>
+<pre><code>## Note: 1 point is out of plotting region in sector 'cd4.tconv', track
+## '1'.</code></pre>
+<pre><code>## Note: 1 point is out of plotting region in sector 'cd8.cells', track
+## '1'.</code></pre>
+<pre><code>## Note: 1 point is out of plotting region in sector 'nk.cells', track
+## '1'.</code></pre>
+<pre><code>## Note: 1 point is out of plotting region in sector 'pdc', track '1'.</code></pre>
+<pre><code>## Note: 1 point is out of plotting region in sector 'plasma.cells', track
+## '1'.</code></pre>
+<p><img src="celltalker_files/figure-html/unnamed-chunk-9-2.png" width="960" style="display: block; margin: auto;"></p>
+<pre><code>## [1] "Plotted interactions"</code></pre>
 </div>
 <div id="summary" class="section level1">
 <h1 class="hasAnchor">
 <a href="#summary" class="anchor"></a>Summary</h1>
-<p>celltalker allows a user to infer ligand/receptor interactions beginning with a count matrix and metadata associated with the experiment. We interrogate 3 different ways that ligand/receptor interactions can differ between sample groups, and provide some examples of visualizing these differences. Have fun investigating how your cells talk to each other!</p>
+<p>celltalker allows a user to infer ligand/receptor interactions. This vignette has walked through how to identify and visualize unique interactions, staring with raw count data and metadata. Future developments will focus on differential networks of cell-cell communication for given ligand/receptor pairs. Stay tuned for future updates. Until then, have fun investigating how your cells “talk” to each other!</p>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -667,11 +471,10 @@
 <li><a href="#introduction">Introduction</a></li>
       <li><a href="#vignette-overview">Vignette overview</a></li>
       <li><a href="#clustering-data-with-seurat">Clustering data with Seurat</a></li>
-      <li><a href="#celltalker---consistently-expressed-ligands-and-receptors">celltalker - Consistently expressed ligands and receptors</a></li>
+      <li><a href="#celltalker">celltalker</a></li>
+      <li><a href="#consistently-expressed-ligands-and-receptors">Consistently expressed ligands and receptors</a></li>
       <li><a href="#determine-putative-ligandreceptor-pairs">Determine putative ligand/receptor pairs</a></li>
-      <li><a href="#unique-ligandreceptor-pairs-in-a-group">Unique ligand/receptor pairs in a group</a></li>
-      <li><a href="#differences-in-clusters-expressing-ligandsreceptors-between-groups">Differences in clusters expressing ligands/receptors between groups</a></li>
-      <li><a href="#differences-in-networks-between-groups">Differences in networks between groups</a></li>
+      <li><a href="#identifying-and-visualizing-unique-ligandreceptor-pairs-in-a-group">Identifying and visualizing unique ligand/receptor pairs in a group</a></li>
       <li><a href="#summary">Summary</a></li>
       </ul>
 </div>
@@ -680,17 +483,20 @@
 </div>
 
 
+
       <footer><div class="copyright">
   <p>Developed by Anthony Cillo.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>
