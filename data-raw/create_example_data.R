@@ -140,4 +140,4 @@ format(object.size(filtered.lig.rec),unit="MB")
 ## Save minimum files
 save(overall.metadata,file="data/overall_metadata.RData")
 save(overall.umap,file="data/overall_umap.RData")
-save(filtered.lig.rec,file="data/overall_pca.RData")
+save(filtered.lig.rec,file="data/filtered.lig.rec.RData")
