@@ -10,6 +10,19 @@
 #'
 #' @return Generates a circos plot connecting ligands and receptors across cell types for a given sample group
 #'
+#' @importFrom magrittr %>%
+#' @importFrom dplyr mutate
+#' @importFrom dplyr select
+#' @importFrom dplyr group_split
+#' @importFrom dplyr summarize
+#' @importFrom dplyr arrange
+#' @importFrom dplyr left_join
+#' @importFrom circlize circos.clear
+#' @importFrom circlize circos.par
+#' @importFrom circlize circos.initialize
+#' @importFrom circlize circos.rect
+#' @importFrom circlize circos.text
+#'
 #' @export
 
 circos_plot <- function(ligand.receptor.frame,colors,lig.col,rec.col) {
