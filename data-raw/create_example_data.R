@@ -124,7 +124,7 @@ format(object.size(overall.metadata),unit="MB")
 overall.umap <- Embeddings(ser,reduction="umap")
 format(object.size(overall.umap),unit="MB")
 
-## Ligand/receptor matrix 
+## Ligand/receptor matrix
 load("data/ramilowski_pairs.rda")
 ligs.recs.all <- unique(c(unique(as.character(ramilowski_pairs$ligand)),
                    unique(as.character(ramilowski_pairs$receptor))))
@@ -140,4 +140,4 @@ format(object.size(filtered.lig.rec),unit="MB")
 ## Save minimum files
 save(overall.metadata,file="data/overall_metadata.RData")
 save(overall.umap,file="data/overall_umap.RData")
-save(filtered.lig.rec,file="data/filtered.lig.rec.RData")
+save(filtered.lig.rec,file="data/filtered_lig_rec.RData")
