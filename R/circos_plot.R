@@ -12,7 +12,7 @@
 #'
 #' @export
 
-create.circos <- function(ligand.receptor.frame,colors,lig.col,rec.col) {
+circos_plot <- function(ligand.receptor.frame,colors,lig.col,rec.col) {
 
   # Reformat data
   part1 <- ligand.receptor.frame %>%
