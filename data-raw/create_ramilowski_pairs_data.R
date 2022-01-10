@@ -1,4 +1,4 @@
-## Code used to prepare the `ramilowski_pairs.rda` dataset goes here
+## Code used to prepare the ligands and receptor list goes here
 
 # Read in curated Supplementary Table 3 from "A draft network of ligand-receptor-mediated multicellular signalling in human" from Nature Communications, July 2015 by Jordan Ramilowski et al. This table contains ligands, receptors, and receptor/ligand pairs
 
