@@ -26,7 +26,7 @@
 #'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr mutate
-#' @importFrom dplyr gather
+#' @importFrom tidyr gather
 #' @importFrom tibble as_tibble
 #' @importFrom dplyr left_join
 #'
