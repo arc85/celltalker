@@ -137,7 +137,12 @@ ligs.keep <- apply(overall.lig.rec,1,sum)[apply(overall.lig.rec,1,sum)>1000 &
 filtered.lig.rec <- overall.lig.rec[names(ligs.keep),]
 format(object.size(filtered.lig.rec),unit="MB")
 
+## Enforce consistent naming
+overall_metadata <- overall.metadata
+overall_umap <- overall.umap
+filtered_lig_rec <- filtered.lig.rec
+
 ## Save minimum files
-save(overall.metadata,file="data/overall_metadata.RData")
-save(overall.umap,file="data/overall_umap.RData")
-save(filtered.lig.rec,file="data/filtered_lig_rec.RData")
+save(overall_metadata,file="data/overall_metadata.rda")
+save(overall_umap,file="data/overall_umap.rda")
+save(filtered_lig_rec,file="data/filtered_lig_rec.rda")
