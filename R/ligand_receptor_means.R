@@ -19,6 +19,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom dplyr mutate
 #' @importFrom tibble as_tibble
+#' @importFrom dplyr recode
 #'
 #' @export
 
@@ -58,10 +59,10 @@ for (i in 1:nrow(ligand_receptor_pairs)) {
 }
 
 interact.frame <- do.call(cbind,lig.rec.pairs)
-remove.cols <- apply(interact.frame,2,function(x) all(x==0))
+remove.cols <- apply(interact.frame,2,function(x) any(is.na(x)))
 interact.frame <- interact.frame[,-which(remove.cols)]
-remove.cols2 <- apply(interact.frame,2,function(x) any(is.na(x)))
-interact.frame <- interact.frame[,-which(remove.cols2)]
+remove.cols2 <- apply(interact.frame,2,function(x) all(x==0))
+interact.frame <- interact.frame[,!remove.cols2]
 
 level.key <- colnames(ligand_mean_dataframe)
 names(level.key) <- seq(1,number_cell_types,1)
