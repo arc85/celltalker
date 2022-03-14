@@ -34,6 +34,10 @@
 
 circos_plot <- function(ligand.receptor.frame,colors,lig.col,rec.col) {
 
+  # Bind variables
+  cell_type1 <- lig <- cell_type2 <- rec <- classes <- ranges <-
+    max_range <- to.class <- to.rec <- lig.rec <- ordered.lig.rec <- type <- NULL
+
   # Reformat data
   part1 <- ligand.receptor.frame %>%
     mutate(lig=sapply(strsplit(interaction,split="_"),function(x) x[[1]])) %>%
@@ -155,7 +159,7 @@ circos_plot <- function(ligand.receptor.frame,colors,lig.col,rec.col) {
         circos.rect(1,0,1+sec.multi.use*a,1,sector.index=int.types.list.multi[[i]]$classes[a],
                     col=ifelse(int.types.list.multi[[i]]$type[a]=="lig","red","blue"),track.index = 2)
         circos.text(1+sec.multi.use*a/2,4,sector.index=int.types.list.multi[[i]]$classes[a],
-                    label=int.types.list.multi[[i]]$lig.rec[a],track.index = 2,facing="downward",cex=0.5)
+                    labels=int.types.list.multi[[i]]$lig.rec[a],track.index = 2,facing="downward",cex=0.5)
 
       } else {
 
@@ -164,7 +168,7 @@ circos_plot <- function(ligand.receptor.frame,colors,lig.col,rec.col) {
         circos.rect(1+sec.multi.use*(a-1),0,1+sec.multi.use*a,1,sector.index=int.types.list.multi[[i]]$classes[a],
                     col=ifelse(int.types.list.multi[[i]]$type[a]=="lig","red","blue"),track.index = 2)
         circos.text(1+sec.multi.use*a-sec.multi.use/2,4,sector.index=int.types.list.multi[[i]]$classes[a],
-                    label=int.types.list.multi[[i]]$lig.rec[a],track.index = 2,facing="downward",cex=0.5)
+                    labels=int.types.list.multi[[i]]$lig.rec[a],track.index = 2,facing="downward",cex=0.5)
 
       }
 
@@ -179,7 +183,7 @@ circos_plot <- function(ligand.receptor.frame,colors,lig.col,rec.col) {
       circos.rect(1,0,2,1,sector.index=int.types.list.individ[[i]]$classes[1],
                   col=ifelse(int.types.list.individ[[i]]$type[1]=="lig",lig.col,rec.col),track.index = 2)
       circos.text(1.5,4,sector.index=int.types.list.individ[[i]]$classes[1],
-                  label=int.types.list.individ[[i]]$lig.rec[1],track.index = 2,facing="downward",cex=0.5)
+                  labels=int.types.list.individ[[i]]$lig.rec[1],track.index = 2,facing="downward",cex=0.5)
 
     }
 
@@ -211,13 +215,13 @@ circos_plot <- function(ligand.receptor.frame,colors,lig.col,rec.col) {
 
           circos.link(int.types.list[[i]]$classes[a], 1+sec.multi[i]*int.types.list[[i]]$ranges[a]-sec.multi[i]/2,
                       int.types.list[[i]]$to.class[[a]], 1+sec.multi[target]*int.types.list[[i]]$to.rec[a]-sec.multi[target]/2,
-                      0.43, 0.43, direction=1, lwd=3, arr.length=0.2, arr.width=(3*0.1)/2)
+                      0.43, 0.43, directional=1, lwd=3, arr.length=0.2, arr.width=(3*0.1)/2)
 
         } else {
 
           circos.link(int.types.list[[i]]$classes[a], 1+sec.multi[i]*int.types.list[[i]]$ranges[a]-sec.multi[i]/2,
                       int.types.list[[i]]$to.class[[a]], 1.5,
-                      0.43, 0.43, direction=1, lwd=3, arr.length=0.2, arr.width=(3*0.1)/2)
+                      0.43, 0.43, directional=1, lwd=3, arr.length=0.2, arr.width=(3*0.1)/2)
         }
 
 
