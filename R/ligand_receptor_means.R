@@ -25,6 +25,9 @@
 
 ligand_receptor_means <- function(ligand_mean_dataframe,receptor_mean_dataframe,ligand_receptor_pairs,number_cell_types) {
 
+# Bind variables
+Var1 <- Var2 <- interaction_pairs <- NULL
+
 lig.rec.pairs <- vector("list",length=nrow(ligand_receptor_pairs))
 
 for (i in 1:nrow(ligand_receptor_pairs)) {
