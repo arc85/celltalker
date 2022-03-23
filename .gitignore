@@ -42,3 +42,6 @@ vignettes/*.pdf
 HD_*
 
 inst/doc
+
+# Other mac nonsense
+.DS_Store
