@@ -4,17 +4,16 @@
 \alias{circos_plot}
 \title{Creates a circos plot from the list of ligands and receptors}
 \usage{
-circos_plot(interactions, clusters, ligand.col = "#C8A757",
-  receptor.col = "#70BC71", interactions.col = "lightgray")
+circos_plot(ligand.receptor.frame, colors, lig.col, rec.col)
 }
 \arguments{
-\item{interactions}{List of ligands and receptors and their associated cell types (i.e. the output from one sample group from the putative_interactions function).}
+\item{ligand.receptor.frame}{List of ligands and receptors and their associated cell types (i.e. the output from one sample group from the putative_interactions function).}
 
-\item{ligand.col}{Color of the bars defining the ligands}
+\item{colors}{Color of the bars defining the ligands}
 
-\item{receptor.col}{Color of the bars definig the receptors}
+\item{lig.col}{Color of the bars definig the receptors}
 
-\item{interactions.col}{Color of the links connecting ligands and receptors. Default is light gray}
+\item{rec.col}{Color of the links connecting ligands and receptors. Default is light gray}
 }
 \value{
 Generates a circos plot connecting ligands and receptors across cell types for a given sample group
