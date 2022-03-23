@@ -14,7 +14,7 @@ Welcome to celltalker. This vignette will show the simpliest use case of celltal
 ## Set up analysis
 
 ```{r setup}
-# library(celltalker)
+library(celltalker)
 library(Seurat)
 library(SeuratData)
 library(tidyverse)
