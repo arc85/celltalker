@@ -52,7 +52,8 @@ circos_plot <- function(ligand.receptor.frame,colors,lig.col,rec.col) {
   colnames(part1) <- colnames(part2) <- c("classes","lig.rec","type")
 
   part12 <- rbind(part1,part2) %>%
-    group_split(classes)
+    group_by(classes) %>%
+    group_split()
 
   part12 <- lapply(part12,function(x) {
 
