@@ -2,6 +2,9 @@
 
 The goal of celltalker is to infer putative ligand and receptor interactions from single-cell RNAseq data. Briefly, celltalker seeks to evaluate cell-cell communication based on expression of ligands and receptors within and between clusters of cells across experimental groups.
 
+A recent refactoring of this package has made the interface much simpler to use, as reflected in the newest vignette.
+
+
 ## Installation
 
 You can install the development version of celltalker from github using devtools:
