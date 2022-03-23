@@ -17,19 +17,18 @@ navbar:
       href: reference/index.html
     intro:
       text: Get started
-      href: articles/celltalker.html
+      href: articles/hca_bm_interactions.html
 
 reference:
   - title: Exported functions
     desc: celltalker has the following functions to facilitate interrogation of cell-cell communication
     contents:
-    - reshape_matrices
-    - create_lig_rec_tib
-    - putative_interactions
-    - unique_interactions
     - circos_plot
+    - ligand_receptor_means
+    - ligand_receptor_scramble
+    - ligand_receptor_stats
 
 articles:
 - title: All vignettes
   desc: ~
-  contents: '`celltalker`'
+  contents: '`hca_bm_interactions`'
