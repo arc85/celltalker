@@ -1,6 +1,6 @@
 Package: celltalker
 Title: Analysis of cell-cell communication from single-cell RNAseq data
-Version: 0.0.5.9000
+Version: 0.0.4.9000
 Authors@R:
     person(given = "Anthony",
            family = "Cillo",
@@ -26,7 +26,8 @@ Suggests:
     RColorBrewer (>= 1.1.0),
     rmarkdown (>= 1.0),
     Seurat (>= 2.3.0),
-    testthat (>= 3.1.1)
+    testthat (>= 3.1.1),
+    SeuratData (>= 0.2.1)
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 Config/testthat/edition: 3
