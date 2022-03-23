@@ -1,0 +1,175 @@
+---
+title: "HCA Bone Marrow Interactions"
+author: "Anthony R Cillo"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{HCA Bone Marrow Interactions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Welcome to celltalker. This vignette will show the simpliest use case of celltalker, namely and identification the top putative ligand and receptor interactions across cell types from the Human Cell Atlas 40,000 Bone Marrow Cells dataset. This dataset is publicly available in a convenient form the SeuratData package. Check out instructions for downloading this dataset (hcabm40k) [here](https://github.com/satijalab/seurat-data).
+
+## Set up analysis
+
+```{r setup}
+# library(celltalker)
+library(Seurat)
+library(SeuratData)
+library(tidyverse)
+
+# Load CMBC data
+data(hcabm40k)
+
+```
+
+## Dimensional reduction and clustering
+
+First, we will perform and standard workflow to identify the major cell types based on canonical gene expression.
+
+```{r cluster}
+
+cbmc <- hcabm40k %>%
+  NormalizeData() %>%
+  FindVariableFeatures() %>%
+  ScaleData() %>%
+  RunPCA()
+
+ElbowPlot(cbmc)
+
+cbmc <- RunUMAP(cbmc,dims=1:8) %>%
+  FindNeighbors(.,dims=1:8) %>%
+  FindClusters(.,res=0.7)
+
+```
+
+## Assign cell types
+
+Next, we will assign the cell types.
+
+For this exemplary analysis with celltalker, we will filter out the transitional subpopulations to focus purely on putative interactions between canonical cell types. The transitional populations are intriguing - but are beyond the scope of this simple vignette.
+
+```{r}
+# Check out clusters
+DimPlot(cbmc,group.by="RNA_snn_res.0.7",label=T)
+
+FeaturePlot(cbmc,c("CD34","CD14","FCGR3A","MS4A1","CD1C","IL3RA"))
+FeaturePlot(cbmc,c("CD3D","CD4","CD8A","FCGR3A","HBB"))
+
+# Check out cell types
+cell_types <- vector("logical",length=ncol(cbmc))
+names(cell_types) <- colnames(cbmc)
+
+cell_types[cbmc@meta.data$RNA_snn_res.0.7=="0" |
+  cbmc@meta.data$RNA_snn_res.0.7=="2" |
+  cbmc@meta.data$RNA_snn_res.0.7=="6" ] <- "CD4 T cells"
+
+cell_types[cbmc@meta.data$RNA_snn_res.0.7=="3"] <- "CD8 T cells"
+
+cell_types[cbmc@meta.data$RNA_snn_res.0.7=="5"] <- "NK cells"
+
+cell_types[cbmc@meta.data$RNA_snn_res.0.7=="8" |
+  cbmc@meta.data$RNA_snn_res.0.7=="11"] <- "RBCs"
+
+cell_types[cbmc@meta.data$RNA_snn_res.0.7=="1"] <- "CD14 monocytes"
+
+cell_types[cbmc@meta.data$RNA_snn_res.0.7=="14"] <- "CD16 monocytes"
+
+cell_types[cbmc@meta.data$RNA_snn_res.0.7=="15"] <- "CD1C DC"
+
+cell_types[cbmc@meta.data$RNA_snn_res.0.7=="10"] <- "CD34 HPSC"
+
+cell_types[cbmc@meta.data$RNA_snn_res.0.7=="4"] <- "B cells"
+
+cbmc[["cell_types"]] <- cell_types
+
+# Filter cells - remove transitional cell populations and RBCs
+cbmc_filtered <- cbmc[,!cbmc[["cell_types"]]=="FALSE"]
+cbmc_filtered <- cbmc_filtered[,!cbmc_filtered[["cell_types"]]=="RBCs"]
+
+# Check out final object
+DimPlot(cbmc_filtered,group.by="cell_types")
+
+```
+
+## Create mean expression matrices
+
+Now, we will create ligand and receptor by cell type matrices that summarize the mean expression level of a given ligand or receptor. But first we will only keep cell types that have 100 or more cells and we will only keep ligands that are expressed at greater than 1000 and less than 20000 across all cell types.
+
+```{r}
+
+# Filter by cells present - require 100 cells
+table(cbmc_filtered@meta.data$cell_types)
+cell_types_keep <- names(table(cbmc_filtered@meta.data$cell_types))[table(cbmc_filtered@meta.data$cell_types)>100]
+
+# Filter cells
+cbmc_filtered <- cbmc_filtered[,cbmc_filtered@meta.data$cell_types %in% cell_types_keep]
+
+# Filter genes
+ligs.recs.all <- unique(c(unique(as.character(ramilowski_pairs$ligand)),
+                   unique(as.character(ramilowski_pairs$receptor))))
+ligs.recs.use <- ligs.recs.all[ligs.recs.all %in% rownames(cbmc_filtered)]
+overall.lig.rec <- GetAssayData(cbmc_filtered,slot="counts",assay="RNA")[ligs.recs.use,]
+
+ligs.keep <- apply(overall.lig.rec,1,sum)[apply(overall.lig.rec,1,sum)>1000 &
+                                            apply(overall.lig.rec,1,sum)<20000]
+
+cbmc_filtered <- cbmc_filtered[names(ligs.keep),]
+
+# Split object
+pbmc3k_filtered_split <- SplitObject(cbmc_filtered,split="cell_types")
+
+expr_ligs <- do.call(cbind,lapply(pbmc3k_filtered_split ,function(x) {
+
+  expr <- GetAssayData(x,assay="RNA",slot="data")
+  apply(expr[rownames(expr) %in% ramilowski_pairs$ligand,],1,mean)
+
+}))
+
+expr_recs <- do.call(cbind,lapply(pbmc3k_filtered_split,function(x) {
+
+  expr <- GetAssayData(x,assay="RNA",slot="data")
+  apply(expr[rownames(expr) %in% ramilowski_pairs$receptor,],1,mean)
+
+}))
+
+```
+
+## Run celltalker
+
+These three function take the ligand and receptor matrices created above and create a joint mean expression level and a scrambled mean expression level. These two resultant tibbles and then used to create a statistically summary of the differences in ligand and receptor levels with the third function.
+
+```{r}
+
+lig_rec_means <- ligand_receptor_means(ligand_mean_dataframe=expr_ligs,receptor_mean_dataframe=expr_recs,ligand_receptor_pairs=ramilowski_pairs,number_cell_types=length(pbmc3k_filtered_split))
+
+lig_rec_scram <- ligand_receptor_scramble(ligand_receptor_means=lig_rec_means,ligand_mean_dataframe=expr_ligs,receptor_mean_dataframe=expr_recs,ligand_receptor_pairs=ramilowski_pairs,number_cell_types=length(pbmc3k_filtered_split),scramble_times=10)
+
+stats <- ligand_receptor_stats(ligand_receptor_means=lig_rec_means,ligand_receptor_scramble=lig_rec_scram)
+
+```
+
+## Create circos plot
+
+```{r}
+
+# ID top 3 interactions per cell type
+top_stats <- stats %>%
+  mutate(fdr=p.adjust(p_val,method="fdr")) %>%
+  filter(fdr<0.05) %>%
+  group_by(cell_type1) %>%
+  top_n(3,interact_ratio) %>%
+  ungroup()
+
+colours_use <- RColorBrewer::brewer.pal(n=length(pbmc3k_filtered_split),"Set2")
+
+suppressMessages(
+circos_plot(ligand.receptor.frame=top_stats,colors=colours_use,lig.col="blue",rec.col="red")
+)
+
+```
+
+## Conclusion
+
+We have now demonstrated a use case for celltalker in which we identified the top 3 ligand/receptor interactions by joint mean expression of cognate ligands and receptors across cell types.
