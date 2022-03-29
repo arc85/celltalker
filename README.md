@@ -39,51 +39,21 @@ is coming soon, but please utilize the **hca_bm_umap_cell_types**
 data.frame for the vignette below.
 
 ``` r
+# Load packages
 suppressMessages({
-library(celltalker)
-library(Seurat)
-library(SeuratData)
-library(tidyverse)
+  library(celltalker)
+  library(Seurat)
+  suppressWarnings(
+    library(SeuratData)
+  )
+  library(tidyverse)
 })
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
 
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
+# Load Human Cell Atlast Bone Marrow from SeuratData
 data(hcabm40k)
 
 # Filter cell and assign cell types to the dataset
+# NB: hca_bm_umap_cell_types has cell types and UMAP embeddings
 hca_bm <- hcabm40k[,rownames(hca_bm_umap_cell_types)]
 hca_bm[["cell_types"]] <- hca_bm_umap_cell_types$cell_types
 
