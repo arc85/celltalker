@@ -1,12 +1,20 @@
 #' Creates a circos plot from the list of ligands and receptors
 #'
-#' @param ligand.receptor.frame List of ligands and receptors and their associated cell types (i.e. the output from one sample group from the putative_interactions function).
+#' @param ligand_receptor_frame Resulting tibble (usually filtered in some way)
+#' from the celltalk function.
 #'
-#' @param colors Color of the bars defining the ligands
+#' @param cell_group_colors Colors used for the groups of cells in the outer
+#' track of the circos plot.
 #'
-#' @param lig.col Color of the bars definig the receptors
+#' @param ligand_color Color to use for ligands. Defaults to "blue".
 #'
-#' @param rec.col Color of the links connecting ligands and receptors. Default is light gray
+#' @param receptor_color Color to use for the receptors. Defaults to "red".
+#'
+#' @param cex_outer Size of the text for the cell groups in the outer layer of
+#' the circos plot. Default is 0.5.
+#'
+#' @param cex_innter Size of the text for the ligand and receptors in the
+#' inner layer of the circos plot. Default is 0.4.
 #'
 #' @return Generates a circos plot connecting ligands and receptors across cell types for a given sample group
 #'
@@ -32,19 +40,24 @@
 #'
 #' @export
 
-circos_plot <- function(ligand.receptor.frame,colors,lig.col,rec.col) {
+circos_plot <- function(ligand_receptor_frame,
+  cell_group_colors,
+  ligand_color="blue",
+  receptor_color="red",
+  cex_outer=0.5,
+  cex_inner=0.4) {
 
   # Bind variables
   cell_type1 <- lig <- cell_type2 <- rec <- classes <- ranges <-
-    max_range <- to.class <- to.rec <- lig.rec <- ordered.lig.rec <- type <- NULL
+    max_range <- to_class <- to_rec <- lig_rec <- ordered_lig_rec <- type <- NULL
 
   # Reformat data
-  part1 <- ligand.receptor.frame %>%
+  part1 <- ligand_receptor_frame %>%
     mutate(lig=sapply(strsplit(interaction,split="_"),function(x) x[[1]])) %>%
     mutate(rec=sapply(strsplit(interaction,split="_"),function(x) x[[2]])) %>%
     select(cell_type1,lig) %>%
     mutate(type="lig")
-  part2 <- ligand.receptor.frame %>%
+  part2 <- ligand_receptor_frame %>%
     mutate(lig=sapply(strsplit(interaction,split="_"),function(x) x[[1]])) %>%
     mutate(rec=sapply(strsplit(interaction,split="_"),function(x) x[[2]])) %>%
     select(cell_type2,rec) %>%
@@ -66,7 +79,7 @@ circos_plot <- function(ligand.receptor.frame,colors,lig.col,rec.col) {
 
   part12 <- do.call(rbind,part12)
 
-  to.join <- ligand.receptor.frame %>%
+  to.join <- ligand_receptor_frame %>%
     mutate(lig=sapply(strsplit(interaction,split="_"),function(x) x[[1]])) %>%
     mutate(rec=sapply(strsplit(interaction,split="_"),function(x) x[[2]])) %>%
     select(cell_type1,cell_type2,lig,rec)
@@ -117,10 +130,12 @@ circos_plot <- function(ligand.receptor.frame,colors,lig.col,rec.col) {
   circos.par(gap.degree=10,track.margin=c(0,0.2))
   circos.initialize(factors=final.construct$classes,x=final.construct$ranges)
 
+  suppressMessages({
   circos.track(ylim = c(0, 1),track.height=0.1,panel.fun = function(x, y) {
-    circos.rect(CELL_META$cell.xlim[1],CELL_META$cell.ylim[1],CELL_META$cell.xlim[2],CELL_META$cell.ylim[2],col=colors[CELL_META$sector.numeric.index])
+    circos.rect(CELL_META$cell.xlim[1],CELL_META$cell.ylim[1],CELL_META$cell.xlim[2],CELL_META$cell.ylim[2],col=cell_group_colors[CELL_META$sector.numeric.index])
     circos.text(CELL_META$xcenter, y=2.5, CELL_META$sector.index,
-                facing = "downward",cex=0.5)
+                facing = "downward",cex=cex_outer)
+  })
   })
 
   ## Build interior track with ligand/receptors colors and gene labels
@@ -157,20 +172,22 @@ circos_plot <- function(ligand.receptor.frame,colors,lig.col,rec.col) {
 
         sec.multi.use <- sec.multi[names(sec.multi)==int.types.list.multi[[i]]$classes[1]]
 
+        suppressMessages({
         circos.rect(1,0,1+sec.multi.use*a,1,sector.index=int.types.list.multi[[i]]$classes[a],
-                    col=ifelse(int.types.list.multi[[i]]$type[a]=="lig","red","blue"),track.index = 2)
+                    col=ifelse(int.types.list.multi[[i]]$type[a]=="lig",ligand_color,receptor_color),track.index = 2)
         circos.text(1+sec.multi.use*a/2,4,sector.index=int.types.list.multi[[i]]$classes[a],
-                    labels=int.types.list.multi[[i]]$lig.rec[a],track.index = 2,facing="downward",cex=0.5)
-
+                    labels=int.types.list.multi[[i]]$lig.rec[a],track.index = 2,facing="downward",cex=cex_inner)
+        })
       } else {
 
         sec.multi.use <- sec.multi[names(sec.multi)==int.types.list.multi[[i]]$classes[1]]
 
+        suppressMessages({
         circos.rect(1+sec.multi.use*(a-1),0,1+sec.multi.use*a,1,sector.index=int.types.list.multi[[i]]$classes[a],
                     col=ifelse(int.types.list.multi[[i]]$type[a]=="lig","red","blue"),track.index = 2)
         circos.text(1+sec.multi.use*a-sec.multi.use/2,4,sector.index=int.types.list.multi[[i]]$classes[a],
-                    labels=int.types.list.multi[[i]]$lig.rec[a],track.index = 2,facing="downward",cex=0.5)
-
+                    labels=int.types.list.multi[[i]]$lig.rec[a],track.index = 2,facing="downward",cex=cex_inner)
+        })
       }
 
     }
@@ -182,9 +199,9 @@ circos_plot <- function(ligand.receptor.frame,colors,lig.col,rec.col) {
     for (i in 1:length(int.types.list.individ)) {
 
       circos.rect(1,0,2,1,sector.index=int.types.list.individ[[i]]$classes[1],
-                  col=ifelse(int.types.list.individ[[i]]$type[1]=="lig",lig.col,rec.col),track.index = 2)
+                  col=ifelse(int.types.list.individ[[i]]$type[1]=="lig",ligand_color,receptor_color),track.index = 2)
       circos.text(1.5,4,sector.index=int.types.list.individ[[i]]$classes[1],
-                  labels=int.types.list.individ[[i]]$lig.rec[1],track.index = 2,facing="downward",cex=0.5)
+                  labels=int.types.list.individ[[i]]$lig.rec[1],track.index = 2,facing="downward",cex=cex_inner)
 
     }
 
