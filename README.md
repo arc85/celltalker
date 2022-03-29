@@ -68,7 +68,7 @@ hca_bm[["umap"]] <- CreateDimReducObject(embeddings=as.matrix(hca_bm_umap_cell_t
 DimPlot(hca_bm,group.by="cell_types")
 ```
 
-<img src="man/figures/README-example-1.png" width="80%" style="display:block; margin:auto;" />
+<img src="man/figures/README-example-1.png" width="100%" />
 
 ``` r
 ## Run celltalker
@@ -99,4 +99,4 @@ circos_plot(ligand_receptor_frame=top_stats,
   cex_inner=0.4)
 ```
 
-<img src="man/figures/README-example-2.png" width="80%" style="display:block; margin:auto;" />
+<img src="man/figures/README-example-2.png" width="100%" />
