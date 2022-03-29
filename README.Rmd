@@ -83,6 +83,6 @@ top_stats <- hca_bm_interactions %>%
 ## Generate a circos plot
 colors_use <- RColorBrewer::brewer.pal(n=length(unique(hca_bm$cell_types)),"Set2")
 
-circos_plot(ligand_receptor_frame=top_stats,cell_group_colors=colors_use,ligand_color="blue",receptor_color="red",cex_outer=0.5,cex_inner=0.25)
+circos_plot(ligand_receptor_frame=top_stats,cell_group_colors=colors_use,ligand_color="blue",receptor_color="red",cex_outer=0.5,cex_inner=0.35)
 
 ```
