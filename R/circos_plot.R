@@ -184,7 +184,7 @@ circos_plot <- function(ligand_receptor_frame,
 
         suppressMessages({
         circos.rect(1+sec.multi.use*(a-1),0,1+sec.multi.use*a,1,sector.index=int.types.list.multi[[i]]$classes[a],
-                    col=ifelse(int.types.list.multi[[i]]$type[a]=="lig","red","blue"),track.index = 2)
+                    col=ifelse(int.types.list.multi[[i]]$type[a]=="lig",ligand_color,receptor_color),track.index = 2)
         circos.text(1+sec.multi.use*a-sec.multi.use/2,4,sector.index=int.types.list.multi[[i]]$classes[a],
                     labels=int.types.list.multi[[i]]$lig.rec[a],track.index = 2,facing="downward",cex=cex_inner)
         })
