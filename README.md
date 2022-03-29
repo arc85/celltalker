@@ -61,8 +61,8 @@ hca_bm[["cell_types"]] <- hca_bm_umap_cell_types$cell_types
 hca_bm <- NormalizeData(hca_bm)
 
 # Add UMAP coordinates
-hca_bm[["umap"]] <- CreateDimReducObject(embeddings=as.matrix(hca_bm_umap_cell_types[,1:2]),key="UMAP_")
-#> Warning: No assay specified, setting assay as RNA by default.
+hca_bm[["umap"]] <- CreateDimReducObject(embeddings=as.matrix(hca_bm_umap_cell_types[,1:2]),
+  key="UMAP_",assay="RNA")
 
 # View cell types
 DimPlot(hca_bm,group.by="cell_types")
@@ -89,11 +89,9 @@ top_stats <- hca_bm_interactions %>%
   ungroup()
 
 ## Generate a circos plot
-colours_use <- RColorBrewer::brewer.pal(n=length(unique(hca_bm$cell_types)),"Set2")
+colors_use <- RColorBrewer::brewer.pal(n=length(unique(hca_bm$cell_types)),"Set2")
 
-suppressMessages(
-circos_plot(ligand.receptor.frame=top_stats,colors=colours_use,lig.col="blue",rec.col="red")
-)
+circos_plot(ligand_receptor_frame=top_stats,cell_group_colors=colors_use,ligand_color="blue",receptor_color="red",cex_outer=0.5,cex_inner=0.4)
 ```
 
 <img src="man/figures/README-example-2.png" width="100%" />
