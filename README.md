@@ -39,63 +39,47 @@ is coming soon, but please utilize the **hca_bm_umap_cell_types**
 data.frame for the vignette below.
 
 ``` r
+suppressMessages({
 library(celltalker)
 library(Seurat)
 library(SeuratData)
-#> Registered S3 method overwritten by 'cli':
-#>   method     from    
-#>   print.boxx spatstat
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-
-#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
-#> element will be used
-#> ── Installed datasets ───────────────────────────────────── SeuratData v0.2.1 ──
-#> ✔ cbmc     3.1.4                        ✔ pbmc3k   3.1.4
-#> ✔ hcabm40k 3.0.0
-#> ────────────────────────────────────── Key ─────────────────────────────────────
-#> ✔ Dataset loaded successfully
-#> ❯ Dataset built with a newer version of Seurat than installed
-#> ❓ Unknown version of Seurat installed
 library(tidyverse)
-#> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──
-#> ✔ ggplot2 3.3.2     ✔ purrr   0.3.3
-#> ✔ tibble  3.0.5     ✔ dplyr   1.0.3
-#> ✔ tidyr   1.0.0     ✔ stringr 1.4.0
-#> ✔ readr   1.3.1     ✔ forcats 0.4.0
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ dplyr::filter() masks stats::filter()
-#> ✖ dplyr::lag()    masks stats::lag()
+})
+#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
+#> element will be used
+
+#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
+#> element will be used
+
+#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
+#> element will be used
+
+#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
+#> element will be used
+
+#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
+#> element will be used
+
+#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
+#> element will be used
+
+#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
+#> element will be used
+
+#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
+#> element will be used
+
+#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
+#> element will be used
+
+#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
+#> element will be used
+
+#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
+#> element will be used
+
+#> Warning in if (is.na(desc)) {: the condition has length > 1 and only the first
+#> element will be used
 
 data(hcabm40k)
 

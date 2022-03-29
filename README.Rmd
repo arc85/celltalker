@@ -35,10 +35,12 @@ Here's a basic use case for celltalker based on a subset of the 40,000 bone marr
 Note that we have identified canonical immune cell types and filtered the dataset for ease of analysis. A vignette documenting this processing is coming soon, but please utilize the **hca_bm_umap_cell_types** data.frame for the vignette below.
 
 ```{r example}
+suppressMessages({
 library(celltalker)
 library(Seurat)
 library(SeuratData)
 library(tidyverse)
+})
 
 data(hcabm40k)
 
