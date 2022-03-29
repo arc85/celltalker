@@ -1,6 +1,0 @@
-pandoc: 2.14.0.3
-pkgdown: 1.4.1
-pkgdown_sha: ~
-articles:
-  hca_bm_interactions: hca_bm_interactions.html
-

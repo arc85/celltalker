@@ -1,10 +1,10 @@
 ---
-title: "HCA Bone Marrow Interactions"
+title: "celltalker"
 author: "Anthony R Cillo"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{HCA Bone Marrow Interactions}
+  %\VignetteIndexEntry{celltalker}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

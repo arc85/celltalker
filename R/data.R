@@ -60,3 +60,18 @@
 #' }
 #' @source \url{https://www.nature.com/articles/ncomms8866}
 "ramilowski_pairs"
+
+#' UMAP embedding and cell types from HCA BM 40k dataset
+#'
+#' This is the UMAP embedding and the canonical immune lineages from the Human
+#' Cell Atlast BM 40k dataset, which is available through the SeuratData package.
+#' This is useful as a small dataset to demonstrate a use case for celltalker.
+#'
+#' @format A data.frame with 33839 rows and 3 variables:
+#' \describe{
+#'   \item{UMAP_1}{first dimension of the UMAP}
+#'   \item{UMAP_2}{second dimension of the UMAP}
+#'   \item{cell_types}{annotated cell types from the HCA BM 40K dataset}
+#' }
+#' @source \url{https://github.com/satijalab/seurat-data}
+"hca_bm_umap_cell_types"
