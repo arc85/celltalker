@@ -287,3 +287,87 @@ value <- interaction_pairs <- scram_mean <- scram_sd <- NULL
 	 mutate(interact_ratio=value/scram_mean)
 
 }
+
+
+#' Create a joint weight interaction strength across replicate samples in a
+#' group
+#'
+#' @param ligand Ligand from a ligand/receptor interaction
+#'
+#' @param receptor Receptor from a ligand/receptor interaction
+#'
+#' @param cell_type1 Cell type expressing the ligand of interest
+#'
+#' @param cell_type2 Cell type expressing the receptor of interest
+#'
+#' @param sample_replicates Name of metadata slot containing the names of the
+#' individual replicate samples in a sample group
+#'
+#' @param sample_group Seruat object containing expression data for the ligand
+#' receptor pair of interest and replicate samples in meta.data
+#'
+#' @return Generates a tibble containing the joint ligand receptor means across
+#' individual replicate samples in a sample group
+#'
+#' @keywords internal
+#' @noRd
+
+cell_type_score <- function(ligand,receptor,cell_type1,cell_type2,sample_replicates,sample_group) {
+
+  split_obj <- Seurat::SplitObject(sample_group,split=sample_replicates)
+
+  # Ligand score
+  cell_type1_score <- sapply(split_obj, function(x) {
+
+    mean(Seurat::GetAssayData(x,slot="data",assay="RNA")[ligand,x@meta.data$cell_types==cell_type1])
+
+  })
+
+  # Receptor score
+  cell_type2_score <- sapply(split_obj, function(x) {
+
+    mean(Seurat::GetAssayData(x,slot="data",assay="RNA")[receptor,x@meta.data$cell_types==cell_type2])
+
+  })
+
+  # Replace NA with 0
+  cell_type1_score <- ifelse(is.na(cell_type1_score),0,cell_type1_score)
+  cell_type2_score <- ifelse(is.na(cell_type2_score),0,cell_type2_score)
+
+  # Joint score
+  joint_score <- mapply(function(x,y) {
+
+  mean(x,y)
+
+  },cell_type1_score,cell_type2_score)
+
+  # Set joint score to 0 if either cell type score is zero
+  joint_score <- ifelse(cell_type1_score==0,0,joint_score)
+  joint_score <- ifelse(cell_type2_score==0,0,joint_score)
+
+}
+
+
+#' Create a data.frame of ligand receptor interactions and cell types to parse
+#' across replicate samples
+#'
+#' @param interaction_stats Tibble from celltalk function, usually filtered to
+#' the top significant ligand and receptor interactions of interest
+#'
+#' @return A data.frame with each row corresponding to a cell type specific
+#' ligand/receptor interaction
+#'
+#' @importFrom magrittr %>%
+#'
+#' @keywords internal
+#' @noRd
+
+id_interactions <- function(interactions_stats) {
+
+  interactions_stats %>%
+    dplyr::mutate(ligand=sapply(strsplit(interaction,split="_"),function(x) x[[1]])) %>%
+    dplyr::mutate(receptor=sapply(strsplit(interaction,split="_"),function(x) x[[2]])) %>%
+    dplyr::select(cell_type1,cell_type2,ligand,receptor) %>%
+    data.frame()
+
+}
