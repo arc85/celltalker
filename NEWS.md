@@ -1,3 +1,7 @@
+# celltalker 0.0.5.9000
+* Added new functionality to identify consistently different ligand receptor interactions when groups of samples are present
+* Added plotting functionality for specific ligand receptor interactions across groups of samples 
+
 # celltalker 0.0.4.9000
 * Refactored celltalker to use a simpler interface for identifying top ligands and receptors between conditions
 * Built new code for circos plotting of ligand and receptor interactions
