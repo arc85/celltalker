@@ -1,0 +1,313 @@
+---
+title: "Interactions across replicates"
+author: "Anthony R Cillo"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{celltalker}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This vignette demonstrates an extension of the core functionality of celltalker to replicate samples. The idea is that this functionality can be used to identify consistently differentially expressed ligand and receptor interactions. To demonstrate this functionality, we will leverage our [previously published](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE139324) dataset of healthy donor PBMC and healthy donor tonsils.
+
+The data preprocessing steps are documented in the data-raw directory. We will start with a low-dimensional visualization with annotated cell types.
+
+## Load packages and setup analysis
+
+```{r setup}
+library(celltalker)
+library(Seurat)
+library(tidyverse)
+
+data("filtered_lig_rec")
+data("overall_metadata")
+data("overall_umap")
+
+## Create a Seurat object based on 5 healthy donor PBMC and 5 healhy donor tonsils
+ser_obj <- CreateSeuratObject(filtered_lig_rec,meta.data=overall_metadata)
+ser_obj[["umap"]] <- CreateDimReducObject(embeddings = overall_umap, key = "UMAP_", assay = DefaultAssay(ser_obj))
+
+DimPlot(ser_obj,group.by="cell_types",split.by="sample_type")
+
+```
+
+## Run celltalker
+
+Next, we will split the data into PBMC and Tonsil Seurat objects and will identify the top ligand and receptor interactions in each of these datasets
+
+```{r}
+
+## Split dataset
+ser_split <- SplitObject(ser_obj,split="sample_type")
+
+## Check out the split data
+ser_split
+
+## Run celltalker - PBMC
+pbmc_interactions <- celltalk(input_object=ser_split[["PBMC"]],
+  metadata_grouping="cell_types",
+  ligand_receptor_pairs=ramilowski_pairs,
+  number_cells_required=50,
+  min_expression=1000,
+  max_expression=20000,
+  scramble_times=10)
+
+## Check out the interactions - PBMC
+pbmc_interactions %>%
+  mutate(p_val_adj=p.adjust(p_val,method="fdr")) %>%
+  filter(p_val_adj<0.05)
+
+## Run celltalker - Tonsil
+tonsil_interactions <- celltalk(input_object=ser_split[["Tonsil"]],
+  metadata_grouping="cell_types",
+  ligand_receptor_pairs=ramilowski_pairs,
+  number_cells_required=50,
+  min_expression=1000,
+  max_expression=20000,
+  scramble_times=10)
+
+## Check out the interactions - tonsil
+tonsil_interactions %>%
+  mutate(p_val_adj=p.adjust(p_val,method="fdr")) %>%
+  filter(p_val_adj<0.05)
+
+```
+
+## Create circos plots
+
+```{r}
+
+## Plot top 3 interactions - PBMC
+top_stats_pbmc <- pbmc_interactions %>%
+  mutate(p_val_adj=p.adjust(p_val,method="fdr")) %>%
+  filter(p_val_adj<0.05) %>%
+  group_by(cell_type1) %>%
+  top_n(3,interact_ratio) %>%
+  ungroup()
+
+# Assign colors to cell types
+all_cell_types <- unique(ser_obj[["cell_types"]][,1])
+
+colors_use <- colorRampPalette(RColorBrewer::brewer.pal(n=8,"Set2"))(length(all_cell_types))
+names(colors_use) <- all_cell_types
+
+suppressMessages(
+circos_plot(ligand_receptor_frame=top_stats_pbmc,
+  cell_group_colors=colors_use,
+  ligand_color="blue",
+  receptor_color="red",
+  cex_outer=0.5,
+  cex_inner=0.4)
+)
+
+## Plot top 3 interactions - Tonsil
+top_stats_tonsil <- tonsil_interactions %>%
+  mutate(p_val_adj=p.adjust(p_val,method="fdr")) %>%
+  filter(p_val_adj<0.05) %>%
+  group_by(cell_type1) %>%
+  top_n(3,interact_ratio) %>%
+  ungroup()
+
+suppressMessages(
+circos_plot(ligand_receptor_frame=top_stats_tonsil,
+  cell_group_colors=colors_use,
+  ligand_color="blue",
+  receptor_color="red",
+  cex_outer=0.5,
+  cex_inner=0.4)
+)
+
+```
+
+## Identify significantly different interactions across patient samples
+
+```{r}
+
+## Score across patients
+# PBMC
+pbmc_pid_split <- SplitObject(ser_split[[1]],split="sample_id")
+
+cell_type1_score <- lapply(pbmc_pid_split, function(x) {
+
+  mean(GetAssayData(x,slot="data",assay="RNA")["CCL5",x@meta.data$cell_types=="CD8 T cells"])
+
+})
+
+cell_type2_score <- lapply(pbmc_pid_split, function(x) {
+
+  mean(GetAssayData(x,slot="data",assay="RNA")["CXCR3",x@meta.data$cell_types=="CD4 T cells"])
+
+})
+
+pbmc_joint_mean <- mapply(function(x,y) {
+
+  mean(x,y)
+
+},cell_type1_score,cell_type2_score)
+
+# Tonsil
+tonsil_pid_split <- SplitObject(ser_split[[2]],split="sample_id")
+
+cell_type1_score <- lapply(tonsil_pid_split, function(x) {
+
+  mean(GetAssayData(x,slot="data",assay="RNA")["CCL5",x@meta.data$cell_types=="CD8 T cells"])
+
+})
+
+cell_type2_score <- lapply(tonsil_pid_split, function(x) {
+
+  mean(GetAssayData(x,slot="data",assay="RNA")["CXCR3",x@meta.data$cell_types=="CD4 T cells"])
+
+})
+
+tonsil_joint_mean <- mapply(function(x,y) {
+
+  mean(x,y)
+
+},cell_type1_score,cell_type2_score)
+
+boxplot(pbmc_joint_mean,tonsil_joint_mean)
+
+t.test(pbmc_joint_mean,tonsil_joint_mean)
+
+## Generic functions
+# Cell type score
+cell_type_score <- function(ligand,receptor,cell_type1,cell_type2,sample_replicates,sample_group) {
+
+  split_obj <- SplitObject(sample_group,split=sample_replicates)
+
+  # Ligand score
+  cell_type1_score <- sapply(split_obj, function(x) {
+
+    mean(GetAssayData(x,slot="data",assay="RNA")[ligand,x@meta.data$cell_types==cell_type1])
+
+  })
+
+  # Receptor score
+  cell_type2_score <- sapply(split_obj, function(x) {
+
+    mean(GetAssayData(x,slot="data",assay="RNA")[receptor,x@meta.data$cell_types==cell_type2])
+
+  })
+
+  # Replace NA with 0
+  cell_type1_score <- ifelse(is.na(cell_type1_score),0,cell_type1_score)
+  cell_type2_score <- ifelse(is.na(cell_type2_score),0,cell_type2_score)
+
+  # Joint score
+  joint_score <- mapply(function(x,y) {
+
+  mean(x,y)
+
+  },cell_type1_score,cell_type2_score)
+
+  # Set joint score to 0 if either cell type score is zero
+  joint_score <- ifelse(cell_type1_score==0,0,joint_score)
+  joint_score <- ifelse(cell_type2_score==0,0,joint_score)
+
+}
+
+# Interactions to compare
+id_interactions <- function(interactions_stats) {
+
+  interactions_stats %>%
+    mutate(ligand=sapply(strsplit(interaction,split="_"),function(x) x[[1]])) %>%
+    mutate(receptor=sapply(strsplit(interaction,split="_"),function(x) x[[2]])) %>%
+    select(cell_type1,cell_type2,ligand,receptor) %>%
+    data.frame()
+
+}
+
+# Compare interactions
+compare_interactions <- function(interactions_stats,sample_replicates,sample_group_1,sample_group_2) {
+
+  interactions_compare <- id_interactions(interactions_stats)
+
+  stats_vector <- vector("list",length=nrow(interactions_compare))
+
+  for (i in 1:nrow(interactions_compare)) {
+
+    score1 <- cell_type_score(ligand=interactions_compare[i,"ligand"],
+      receptor=interactions_compare[i,"receptor"],
+      cell_type1=interactions_compare[i,"cell_type1"],
+      cell_type2=interactions_compare[i,"cell_type2"],
+      sample_replicates=sample_replicates,
+      sample_group=sample_group_1
+    )
+
+    score2 <- cell_type_score(ligand=interactions_compare[i,"ligand"],
+      receptor=interactions_compare[i,"receptor"],
+      cell_type1=interactions_compare[i,"cell_type1"],
+      cell_type2=interactions_compare[i,"cell_type2"],
+      sample_replicates=sample_replicates,
+      sample_group=sample_group_2
+    )
+
+    stats_vector[[i]] <- data.frame(mean_group1=mean(score1),
+      mean_group2=mean(score2),
+      p_value=wilcox.test(score1,score2)$p.value)
+
+  }
+
+  stats_frame <- do.call(rbind,stats_vector)
+
+  cbind(interactions_compare,stats_frame)
+
+}
+
+tonsil_interactions_sig <- compare_interactions(interactions_stats=top_stats_tonsil,
+  sample_replicates="sample_id",
+  sample_group_1=ser_split[["Tonsil"]],
+  sample_group_2=ser_split[["PBMC"]]
+)
+
+# Plot differences
+# Use tonsil_interactions_sig as input
+
+boxplot_group_interaction <- function(ligand,receptor,cell_type1,cell_type2,sample_replicates,sample_group_1,sample_group_2) {
+
+  score1 <- cell_type_score(ligand=ligand,
+    receptor=receptor,
+    cell_type1=cell_type1,
+    cell_type2=cell_type2,
+    sample_replicates=sample_replicates,
+    sample_group=sample_group_1
+  )
+
+  score2 <- cell_type_score(ligand=ligand,
+    receptor=receptor,
+    cell_type1=cell_type1,
+    cell_type2=cell_type2,
+    sample_replicates=sample_replicates,
+    sample_group=sample_group_2
+  )
+
+  extract_names1 <- sample_group_1[["sample_type"]][1,1]
+  extract_names2 <- sample_group_2[["sample_type"]][1,1]
+
+  res <- data.frame(sample_id=c(names(score1),names(score2)),
+  sample_group=c(rep(extract_names1,length=length(score1)),
+    rep(extract_names2,length=length(score2))),
+    Interaction_scores=c(score1,score2))
+
+  ggplot(res,aes(x=sample_group,y=Interaction_scores,colour=sample_group)) +
+    geom_boxplot(outlier.shape=NA) +
+    geom_jitter(width=0.1,height=0) +
+    theme_bw() +
+    xlab("Sample group") +
+    ylab("Interaction scores") +
+    guides(colour=guide_legend(title="Sample group"))
+
+}
+
+boxplot_group_interaction(ligand="CD40LG",
+  receptor="TRAF3",
+  cell_type1="CD4 T cells",
+  cell_type2="Plasmablasts",
+  sample_replicates="sample_id",
+  sample_group_1=ser_split[["Tonsil"]],
+  sample_group_2=ser_split[["PBMC"]]
+)
+
+```
