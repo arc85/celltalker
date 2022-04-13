@@ -4,7 +4,7 @@ author: "Anthony R Cillo"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Evaluate consistent interactions}
+  %\VignetteIndexEntry{Identify significantly different interactions across groups with replicate samples}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
