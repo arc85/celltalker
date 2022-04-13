@@ -1,0 +1,7 @@
+pandoc: 2.14.0.3
+pkgdown: 1.4.1
+pkgdown_sha: ~
+articles:
+  celltalker: celltalker.html
+  consistent_interactions: consistent_interactions.html
+
