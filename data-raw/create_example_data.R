@@ -129,7 +129,7 @@ load("data/ramilowski_pairs.rda")
 ligs.recs.all <- unique(c(unique(as.character(ramilowski_pairs$ligand)),
                    unique(as.character(ramilowski_pairs$receptor))))
 ligs.recs.use <- ligs.recs.all[ligs.recs.all %in% rownames(ser)]
-overall.lig.rec <- GetAssayData(ser,slot="counts",assay="RNA")[ligs.recs.use,]
+overall.lig.rec <- GetAssayData(ser,slot="data",assay="RNA")[ligs.recs.use,]
 
 # Filter to those expressed >1000 counts and <20000 counts
 ligs.keep <- apply(overall.lig.rec,1,sum)[apply(overall.lig.rec,1,sum)>1000 &
