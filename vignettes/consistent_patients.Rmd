@@ -4,7 +4,7 @@ author: "Anthony R Cillo"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{celltalker}
+  %\VignetteIndexEntry{Evaluate consistent interactions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
