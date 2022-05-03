@@ -18,38 +18,42 @@
 #'
 #' @export
 
-compare_group_interactions <- function(interactions_stats,sample_replicates,sample_group_1,sample_group_2) {
+compare_group_interactions <- function(seurat_object,
+  interaction_stats,
+  sample_replicates,
+  sample_groups,
+  p_value_filter=NULL,
+  fdr_value_filter=0.05) {
 
-  interactions_compare <- id_interactions(interactions_stats)
+  input_formula <- as.formula(paste("scores~sample_groups",sep=""))
+  interactions_compare <- id_interactions(interaction_stats)
 
-  stats_vector <- vector("list",length=nrow(interactions_compare))
+  extracted_sample_groups <- extract_sample_group_replicates()
 
-  for (i in 1:nrow(interactions_compare)) {
+  replicate_scores_frame <- cell_type_lig_rec_frame(interactions_compare,seurat_object,sample_replicates,sample_groups,cell_types)
+  # Replace dots with dashes in column names
+  colnames(replicate_scores_frame) <- gsub("\\.","-",colnames(replicate_scores_frame))
 
-    score1 <- cell_type_score(ligand=interactions_compare[i,"ligand"],
-      receptor=interactions_compare[i,"receptor"],
-      cell_type1=interactions_compare[i,"cell_type1"],
-      cell_type2=interactions_compare[i,"cell_type2"],
-      sample_replicates=sample_replicates,
-      sample_group=sample_group_1
-    )
+  ## Need to derive a way to extract sample groups
+  interaction_scores_frame <- cell_type_ligand_receptor_score(replicate_scores_frame,interactions_compare,
+    extracted_sample_groups)
 
-    score2 <- cell_type_score(ligand=interactions_compare[i,"ligand"],
-      receptor=interactions_compare[i,"receptor"],
-      cell_type1=interactions_compare[i,"cell_type1"],
-      cell_type2=interactions_compare[i,"cell_type2"],
-      sample_replicates=sample_replicates,
-      sample_group=sample_group_2
-    )
+  mod_res <- interaction_scores_frame %>%
+    mutate(unique_group=paste(cell_type1,ligand,cell_type2,receptor,sep="_")) %>%
+    split(.$unique_group) %>%
+    map(~lm(input_formula,data=.))
 
-    stats_vector[[i]] <- data.frame(mean_group1=mean(score1),
-      mean_group2=mean(score2),
-      p_value=wilcox.test(score1,score2)$p.value)
+  p_vals <- lapply(mod_res,function(x) {
+    if (class(x) != "lm") stop("Not an object of class 'lm' ")
+    f <- summary(x)$fstatistic
+    p <- pf(f[1],f[2],f[3],lower.tail=F)
+    attributes(p) <- NULL
+    return(p)
+  })
 
-  }
+  fdr_vals <- p.adjust(p_vals,method="fdr")
 
-  stats_frame <- do.call(rbind,stats_vector)
-
-  cbind(interactions_compare,stats_frame)
+  ## Filter results
+  lapply(mod_res[fdr_vals<0.05],function(x) summary(x))
 
 }
