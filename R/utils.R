@@ -288,6 +288,54 @@ value <- interaction_pairs <- scram_mean <- scram_sd <- NULL
 
 }
 
+#' Create a data.frame of ligand receptor interactions and cell types to parse
+#' across replicate samples
+#'
+#' @param interaction_stats Tibble from celltalk function, usually filtered to
+#' the top significant ligand and receptor interactions of interest
+#'
+#' @return A data.frame with each row corresponding to a cell type specific
+#' ligand/receptor interaction
+#'
+#' @importFrom magrittr %>%
+#' @importFrom dplyr mutate
+#'
+#' @keywords internal
+#' @noRd
+
+id_interactions <- function(interactions_stats) {
+
+  interactions_stats %>%
+    mutate(ligand=sapply(strsplit(interaction,split="_"),function(x) x[[1]])) %>%
+    mutate(receptor=sapply(strsplit(interaction,split="_"),function(x) x[[2]])) %>%
+    dplyr::select(cell_type1,cell_type2,ligand,receptor) %>%
+    data.frame()
+
+}
+
+#' Extract sample group replicates from seurat object
+#'
+#' @param seurat_object Seurat object containing expression data acorss all
+#' samples and cells
+#'
+#' @param sample_group Name of the meta.data column in a Seurat object that
+#' has the name of the sample group
+#'
+#' @return A character vector with the names of each sample group replicated
+#' the proper number of times
+#'
+#' @keywords internal
+#' @noRd
+
+extract_sample_group_replicates <- function(seurat_object,sample_groups) {
+
+  seurat_object@meta.data %>%
+    dplyr::select(dplyr::all_of(sample_groups),sample_id) %>%
+    dplyr::distinct() %>%
+    dplyr::select(dplyr::all_of(sample_groups)) %>%
+    pull()
+
+}
 
 #' Create a data.frame of ligand and receptors across cell types from individual
 #' replicate samples
@@ -312,7 +360,7 @@ value <- interaction_pairs <- scram_mean <- scram_sd <- NULL
 #' @keywords internal
 #' @noRd
 
-cell_type_lig_rec_frame <- function(interactions_compare,seurat_object,sample_replicates,sample_groups,cell_types) {
+cell_type_lig_rec_frame <- function(interactions_compare,seurat_object,sample_replicates,sample_groups,metadata_grouping) {
 
   lig_rec_use <- unique(c(interactions_compare$ligand,interactions_compare$receptor))
   cell_types_use <- unique(c(interactions_compare$cell_type1,interactions_compare$cell_type2))
@@ -326,7 +374,7 @@ cell_type_lig_rec_frame <- function(interactions_compare,seurat_object,sample_re
     as_tibble(.,rownames="cell_barcodes")
 
   expr_meta <- left_join(expr_dat,meta_dat,by="cell_barcodes") %>%
-    mutate(replicate_types=paste(.data[[sample_groups]],.data[[cell_types]],.data[[sample_replicates]],sep=","))
+    mutate(replicate_types=paste(.data[[sample_groups]],.data[[metadata_grouping]],.data[[sample_replicates]],sep=","))
 
   unique_names <- names(table(expr_meta$replicate_types))
 
@@ -355,22 +403,17 @@ cell_type_lig_rec_frame <- function(interactions_compare,seurat_object,sample_re
 
 }
 
-#' Create a cell type and ligand receptor specific tibble across sample
-#' group
+#' Create a cell type and ligand/receptor specific tibble across sample
+#' groups
 #'
-#' @param ligand Ligand from a ligand/receptor interaction
+#' @param replicate_scores_frame Data.frame containing ligand and receptor
+#' interactions across cell types. This is the output from the
+#' cell_type_lig_rec_frame function.
 #'
-#' @param receptor Receptor from a ligand/receptor interaction
-#'
-#' @param cell_type1 Cell type expressing the ligand of interest
-#'
-#' @param cell_type2 Cell type expressing the receptor of interest
-#'
-#' @param sample_replicates Name of metadata slot containing the names of the
-#' individual replicate samples in a sample group
-#'
-#' @param sample_group Seruat object containing expression data for the ligand
-#' receptor pair of interest and replicate samples in meta.data
+#' @param interactions_compare Cell type specific ligand/receptor interaction
+#' pairs to evaluate. This is the output from id_interactions.
+#' @param extracted_sample_groups Vector containing the replicated names of the
+#' sample groups. This is the output from extract_sample_group_replicates.
 #'
 #' @return Generates a tibble containing the joint ligand receptor means across
 #' individual replicate samples in a sample group
@@ -380,25 +423,29 @@ cell_type_lig_rec_frame <- function(interactions_compare,seurat_object,sample_re
 
 cell_type_ligand_receptor_score <- function(replicate_scores_frame,
   interactions_compare,
-  extracted_sample_groups,
   extracted_sample_groups) {
 
 interaction_scores <- list()
 
 for (i in 1:nrow(interactions_compare)) {
 
+ligand <- interactions_compare[i,"ligand"]
+receptor <- interactions_compare[i,"receptor"]
+
 sample1 <- replicate_scores_frame %>%
-  select(interactions_compare[i,"ligand"],cell_types,sample_replicates,sample_groups) %>%
+  select(ligand,cell_types,sample_replicates,sample_groups) %>%
   filter(cell_types==interactions_compare[i,"cell_type1"])
 
-sample1 <- complete(sample1,cell_types,sample_replicates,fill=list(ADAM17=0))
+sample1 <- complete(sample1,cell_types,sample_replicates)
+sample1[is.na(sample1[,ligand]),ligand] <- 0
 sample1$sample_groups <- extracted_sample_groups
 
 sample2 <- replicate_scores_frame %>%
-  select(interactions_compare[i,"receptor"],cell_types,sample_replicates,sample_groups) %>%
+  select(receptor,cell_types,sample_replicates,sample_groups) %>%
   filter(cell_types==interactions_compare[i,"cell_type2"])
 
-sample2 <- complete(sample2,cell_types,sample_replicates,fill=list(ITGB1=0))
+sample2 <- complete(sample2,cell_types,sample_replicates,fill=list(receptor=0))
+sample2[is.na(sample2[,receptor]),receptor] <- 0
 sample2$sample_groups <- extracted_sample_groups
 
 sample_score <- data.frame((sample1[,3] + sample2[,3]) / 2,
@@ -415,42 +462,5 @@ interaction_scores[[i]] <- sample_score
 }
 
 do.call(rbind,interaction_scores)
-
-}
-
-#' Extract sample group replicates from seurat object
-#'
-
-extract_sample_group_replicates <- function(seurat_object,sample_groups) {
-
-  seurat_object@meta.data %>%
-    select(all_of(sample_groups),sample_id) %>%
-    distinct() %>%
-    select(all_of(sample_groups)) %>%
-    pull()
-
-}
-
-#' Create a data.frame of ligand receptor interactions and cell types to parse
-#' across replicate samples
-#'
-#' @param interaction_stats Tibble from celltalk function, usually filtered to
-#' the top significant ligand and receptor interactions of interest
-#'
-#' @return A data.frame with each row corresponding to a cell type specific
-#' ligand/receptor interaction
-#'
-#' @importFrom magrittr %>%
-#'
-#' @keywords internal
-#' @noRd
-
-id_interactions <- function(interactions_stats) {
-
-  interactions_stats %>%
-    dplyr::mutate(ligand=sapply(strsplit(interaction,split="_"),function(x) x[[1]])) %>%
-    dplyr::mutate(receptor=sapply(strsplit(interaction,split="_"),function(x) x[[2]])) %>%
-    dplyr::select(cell_type1,cell_type2,ligand,receptor) %>%
-    data.frame()
 
 }
