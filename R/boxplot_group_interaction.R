@@ -59,6 +59,8 @@ boxplot_group_interaction <- function(seurat_object,
     interaction_scores_frame %>%
       filter(cell_type1=={{cell_type1}}) %>%
       filter(cell_type2=={{cell_type2}}) %>%
+      filter(ligand=={{ligand}}) %>%
+      filter(receptor=={{receptor}}) %>%
       mutate(`Sample group`=sample_groups) %>%
       ggplot(.,aes(x=`Sample group`,y=scores,colour=`Sample group`)) +
         geom_boxplot(outlier.shape=NA) +
