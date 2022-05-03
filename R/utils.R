@@ -288,9 +288,57 @@ value <- interaction_pairs <- scram_mean <- scram_sd <- NULL
 
 }
 
+#' Create a data.frame of ligand receptor interactions and cell types to parse
+#' across replicate samples
+#'
+#' @param interaction_stats Tibble from celltalk function, usually filtered to
+#' the top significant ligand and receptor interactions of interest
+#'
+#' @return A data.frame with each row corresponding to a cell type specific
+#' ligand/receptor interaction
+#'
+#' @importFrom magrittr %>%
+#' @importFrom dplyr mutate
+#'
+#' @keywords internal
+#' @noRd
 
-#' Create a joint weight interaction strength across replicate samples in a
-#' group
+id_interactions <- function(interactions_stats) {
+
+  interactions_stats %>%
+    mutate(ligand=sapply(strsplit(interaction,split="_"),function(x) x[[1]])) %>%
+    mutate(receptor=sapply(strsplit(interaction,split="_"),function(x) x[[2]])) %>%
+    dplyr::select(cell_type1,cell_type2,ligand,receptor) %>%
+    data.frame()
+
+}
+
+#' Extract sample group replicates from seurat object
+#'
+#' @param seurat_object Seurat object containing expression data acorss all
+#' samples and cells
+#'
+#' @param sample_group Name of the meta.data column in a Seurat object that
+#' has the name of the sample group
+#'
+#' @return A character vector with the names of each sample group replicated
+#' the proper number of times
+#'
+#' @keywords internal
+#' @noRd
+
+extract_sample_group_replicates <- function(seurat_object,sample_groups) {
+
+  seurat_object@meta.data %>%
+    dplyr::select(dplyr::all_of(sample_groups),sample_id) %>%
+    dplyr::distinct() %>%
+    dplyr::select(dplyr::all_of(sample_groups)) %>%
+    pull()
+
+}
+
+#' Create a data.frame of ligand and receptors across cell types from individual
+#' replicate samples
 #'
 #' @param ligand Ligand from a ligand/receptor interaction
 #'
@@ -312,62 +360,107 @@ value <- interaction_pairs <- scram_mean <- scram_sd <- NULL
 #' @keywords internal
 #' @noRd
 
-cell_type_score <- function(ligand,receptor,cell_type1,cell_type2,sample_replicates,sample_group) {
+cell_type_lig_rec_frame <- function(interactions_compare,seurat_object,sample_replicates,sample_groups,metadata_grouping) {
 
-  split_obj <- Seurat::SplitObject(sample_group,split=sample_replicates)
+  lig_rec_use <- unique(c(interactions_compare$ligand,interactions_compare$receptor))
+  cell_types_use <- unique(c(interactions_compare$cell_type1,interactions_compare$cell_type2))
 
-  # Ligand score
-  cell_type1_score <- sapply(split_obj, function(x) {
+  expr_dat <- GetAssayData(seurat_object,slot="data",assay="RNA") %>%
+    as.matrix() %>%
+    t() %>%
+    as_tibble(.,rownames="cell_barcodes")
 
-    mean(Seurat::GetAssayData(x,slot="data",assay="RNA")[ligand,x@meta.data$cell_types==cell_type1])
+  meta_dat <- seurat_object@meta.data %>%
+    as_tibble(.,rownames="cell_barcodes")
+
+  expr_meta <- left_join(expr_dat,meta_dat,by="cell_barcodes") %>%
+    mutate(replicate_types=paste(.data[[sample_groups]],.data[[metadata_grouping]],.data[[sample_replicates]],sep=","))
+
+  unique_names <- names(table(expr_meta$replicate_types))
+
+  expr_meta_list <- expr_meta %>%
+    group_split(replicate_types)
+
+  names(expr_meta_list) <- unique_names
+
+  expr_meta_list <- expr_meta_list[sapply(expr_meta_list,nrow)>1]
+
+  mean_lig_rec <- lapply(expr_meta_list,function(x) {
+
+    apply(x[,lig_rec_use],2,mean)
 
   })
 
-  # Receptor score
-  cell_type2_score <- sapply(split_obj, function(x) {
+  mean_lig_rec_frame <- do.call(rbind,mean_lig_rec) %>% data.frame()
+  mean_lig_rec_frame$sample_groups <- sapply(strsplit(rownames(mean_lig_rec_frame),split=","),function(x)
+    x[[1]])
+  mean_lig_rec_frame$cell_types <- sapply(strsplit(rownames(mean_lig_rec_frame),split=","),function(x)
+    x[[2]])
+  mean_lig_rec_frame$sample_replicates <- as.factor(sapply(strsplit(rownames(mean_lig_rec_frame),split=","),function(x)
+    x[[3]]))
 
-    mean(Seurat::GetAssayData(x,slot="data",assay="RNA")[receptor,x@meta.data$cell_types==cell_type2])
-
-  })
-
-  # Replace NA with 0
-  cell_type1_score <- ifelse(is.na(cell_type1_score),0,cell_type1_score)
-  cell_type2_score <- ifelse(is.na(cell_type2_score),0,cell_type2_score)
-
-  # Joint score
-  joint_score <- mapply(function(x,y) {
-
-  mean(x,y)
-
-  },cell_type1_score,cell_type2_score)
-
-  # Set joint score to 0 if either cell type score is zero
-  joint_score <- ifelse(cell_type1_score==0,0,joint_score)
-  joint_score <- ifelse(cell_type2_score==0,0,joint_score)
+    mean_lig_rec_frame
 
 }
 
-
-#' Create a data.frame of ligand receptor interactions and cell types to parse
-#' across replicate samples
+#' Create a cell type and ligand/receptor specific tibble across sample
+#' groups
 #'
-#' @param interaction_stats Tibble from celltalk function, usually filtered to
-#' the top significant ligand and receptor interactions of interest
+#' @param replicate_scores_frame Data.frame containing ligand and receptor
+#' interactions across cell types. This is the output from the
+#' cell_type_lig_rec_frame function.
 #'
-#' @return A data.frame with each row corresponding to a cell type specific
-#' ligand/receptor interaction
+#' @param interactions_compare Cell type specific ligand/receptor interaction
+#' pairs to evaluate. This is the output from id_interactions.
+#' @param extracted_sample_groups Vector containing the replicated names of the
+#' sample groups. This is the output from extract_sample_group_replicates.
 #'
-#' @importFrom magrittr %>%
+#' @return Generates a tibble containing the joint ligand receptor means across
+#' individual replicate samples in a sample group
 #'
 #' @keywords internal
 #' @noRd
 
-id_interactions <- function(interactions_stats) {
+cell_type_ligand_receptor_score <- function(replicate_scores_frame,
+  interactions_compare,
+  extracted_sample_groups) {
 
-  interactions_stats %>%
-    dplyr::mutate(ligand=sapply(strsplit(interaction,split="_"),function(x) x[[1]])) %>%
-    dplyr::mutate(receptor=sapply(strsplit(interaction,split="_"),function(x) x[[2]])) %>%
-    dplyr::select(cell_type1,cell_type2,ligand,receptor) %>%
-    data.frame()
+interaction_scores <- list()
+
+for (i in 1:nrow(interactions_compare)) {
+
+ligand <- interactions_compare[i,"ligand"]
+receptor <- interactions_compare[i,"receptor"]
+
+sample1 <- replicate_scores_frame %>%
+  select(ligand,cell_types,sample_replicates,sample_groups) %>%
+  filter(cell_types==interactions_compare[i,"cell_type1"])
+
+sample1 <- complete(sample1,cell_types,sample_replicates)
+sample1[is.na(sample1[,ligand]),ligand] <- 0
+sample1$sample_groups <- extracted_sample_groups
+
+sample2 <- replicate_scores_frame %>%
+  select(receptor,cell_types,sample_replicates,sample_groups) %>%
+  filter(cell_types==interactions_compare[i,"cell_type2"])
+
+sample2 <- complete(sample2,cell_types,sample_replicates,fill=list(receptor=0))
+sample2[is.na(sample2[,receptor]),receptor] <- 0
+sample2$sample_groups <- extracted_sample_groups
+
+sample_score <- data.frame((sample1[,3] + sample2[,3]) / 2,
+  sample_groups=sample1$sample_groups,
+  cell_type1=interactions_compare[i,"cell_type1"],
+  cell_type2=interactions_compare[i,"cell_type2"],
+  ligand=interactions_compare[i,"ligand"],
+  receptor=interactions_compare[i,"receptor"])
+
+colnames(sample_score)[1] <- "scores"
+
+interaction_scores[[i]] <- sample_score
+
+}
+
+do.call(rbind,interaction_scores)
 
 }
