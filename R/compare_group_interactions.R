@@ -1,55 +1,57 @@
 #' Statistically compare interactions between groups of samples
 #'
+#' @param seurat_object Seurat object containing expression data acorss all
+#' samples and cells
+#'
 #' @param interaction_stats Tibble from celltalk function, usually filtered to
 #' the top significant ligand and receptor interactions of interest
 #'
 #' @param sample_replicates Name of the meta.data column in a Seurat object that
 #' has the samples of the individual replicate samples
 #'
-#' @param sample_group_1 The group of samples from which interactions will be
-#' identified for statistical comparison
+#' @param sample_groups Name of the meta.data column in a Seurat object that
+#' has the name of the sample group
 #'
-#' @param sample_group_2 Comparitor group from which interactions from
-#' sample_group_1 will be measured against
+#' @param metadata_grouping Name of the meta.data column in a Seurat object that
+#' has the name of the groups of cells to evaluate (e.g. "cell_types" containing
+#' previously identified cell types)
 #'
-#' @return A data.frame contain ligands, receptors, cell types and the
-#' statistical significant of the joint means in sample_group_1 versus
-#' the joint means in sample_group_2
+#' @return A list of linear models containing the coefficients and statistics for
+#' assessing differences in joint ligand and receptor expression between sample
+#' groups. Note that this requires replicate samples from each samples group.
+#'
+#' @importFrom magrittr %>%
+#' @importFrom dplyr mutate
+#' @importFrom purrr map
+#' @importFrom dplyr recode
+#' @importFrom stats lm
 #'
 #' @export
 
-compare_group_interactions <- function(interactions_stats,sample_replicates,sample_group_1,sample_group_2) {
+compare_group_interactions <- function(seurat_object,
+  interaction_stats,
+  sample_replicates,
+  sample_groups,
+  metadata_grouping) {
 
-  interactions_compare <- id_interactions(interactions_stats)
+  cell_type1 <- cell_type2 <- ligand <- receptor <- sample_id <- `.`<- NULL
 
-  stats_vector <- vector("list",length=nrow(interactions_compare))
+  interactions_compare <- id_interactions(interaction_stats)
 
-  for (i in 1:nrow(interactions_compare)) {
+  extracted_sample_groups <- extract_sample_group_replicates(seurat_object,sample_groups)
 
-    score1 <- cell_type_score(ligand=interactions_compare[i,"ligand"],
-      receptor=interactions_compare[i,"receptor"],
-      cell_type1=interactions_compare[i,"cell_type1"],
-      cell_type2=interactions_compare[i,"cell_type2"],
-      sample_replicates=sample_replicates,
-      sample_group=sample_group_1
-    )
+  replicate_scores_frame <- cell_type_lig_rec_frame(interactions_compare,seurat_object,sample_replicates,sample_groups,metadata_grouping)
+  # Replace dots with dashes in column names e.g. HLA.F should be HLA-F
+  colnames(replicate_scores_frame) <- gsub("\\.","-",colnames(replicate_scores_frame))
 
-    score2 <- cell_type_score(ligand=interactions_compare[i,"ligand"],
-      receptor=interactions_compare[i,"receptor"],
-      cell_type1=interactions_compare[i,"cell_type1"],
-      cell_type2=interactions_compare[i,"cell_type2"],
-      sample_replicates=sample_replicates,
-      sample_group=sample_group_2
-    )
+  interaction_scores_frame <- cell_type_ligand_receptor_score(replicate_scores_frame,interactions_compare,
+    extracted_sample_groups)
 
-    stats_vector[[i]] <- data.frame(mean_group1=mean(score1),
-      mean_group2=mean(score2),
-      p_value=wilcox.test(score1,score2)$p.value)
+  input_formula <- stats::as.formula(paste("scores~sample_groups",sep=""))
 
-  }
-
-  stats_frame <- do.call(rbind,stats_vector)
-
-  cbind(interactions_compare,stats_frame)
+  mod_res <- interaction_scores_frame %>%
+    mutate(unique_group=paste(cell_type1,ligand,cell_type2,receptor,sep="_")) %>%
+    split(.$unique_group) %>%
+    map(~lm(input_formula,data=.))
 
 }

@@ -39,6 +39,8 @@ celltalk <- function(input_object,
   scramble_times=10
 ) {
 
+cell_types <- ramilowski_pairs <- NULL
+
   expr_mat_list <- create_expression_matrices(input_object,
     metadata_grouping,
     ligand_receptor_pairs,

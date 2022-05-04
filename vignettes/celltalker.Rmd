@@ -24,7 +24,8 @@ suppressMessages({
   suppressWarnings(
     library(SeuratData)
   )
-  library(tidyverse)
+  library(dplyr)
+  library(magrittr)
 })
 
 # Load Human Cell Atlast Bone Marrow from SeuratData
@@ -74,7 +75,7 @@ circos_plot(ligand_receptor_frame=top_stats,
 
 ```
 
-## Conclusion and next steps 
+## Conclusion and next steps
 
 We have now demonstrated a use case for celltalker in which we identified the top 3 ligand/receptor interactions by joint mean expression of cognate ligands and receptors across cell types.
 
