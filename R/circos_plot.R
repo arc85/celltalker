@@ -49,7 +49,8 @@ circos_plot <- function(ligand_receptor_frame,
 
   # Bind variables
   cell_type1 <- lig <- cell_type2 <- rec <- classes <- ranges <-
-    max_range <- to_class <- to_rec <- lig_rec <- ordered_lig_rec <- type <- NULL
+    max_range <- to_class <- to_rec <- lig_rec <- ordered_lig_rec <- type <-
+    lig.rec <- to.class <- to.rec <- ordered.lig.rec <- NULL
 
   # Reformat data
   part1 <- ligand_receptor_frame %>%

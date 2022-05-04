@@ -33,6 +33,7 @@
 #' in each sample group.
 #'
 #' @importFrom ggplot2 ggplot aes geom_boxplot geom_jitter theme_bw ylab
+#' @importFrom rlang .data
 #'
 #' @export
 
@@ -45,6 +46,8 @@ boxplot_group_interaction <- function(seurat_object,
   receptor,
   cell_type1,
   cell_type2) {
+
+    `Sample group` <- scores <- NULL
 
     interactions_compare <- id_interactions(interaction_stats)
 
@@ -63,7 +66,7 @@ boxplot_group_interaction <- function(seurat_object,
       filter(ligand=={{ligand}}) %>%
       filter(receptor=={{receptor}}) %>%
       mutate(`Sample group`=sample_groups) %>%
-      ggplot(.,aes(x=`Sample group`,y=scores,colour=`Sample group`)) +
+      ggplot(.data,aes(x=`Sample group`,y=scores,colour=`Sample group`)) +
         geom_boxplot(outlier.shape=NA) +
         geom_jitter(width=0.1,height=0) +
         theme_bw() +
