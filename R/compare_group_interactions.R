@@ -9,7 +9,7 @@
 #' @param sample_replicates Name of the meta.data column in a Seurat object that
 #' has the samples of the individual replicate samples
 #'
-#' @param sample_group Name of the meta.data column in a Seurat object that
+#' @param sample_groups Name of the meta.data column in a Seurat object that
 #' has the name of the sample group
 #'
 #' @param metadata_grouping Name of the meta.data column in a Seurat object that

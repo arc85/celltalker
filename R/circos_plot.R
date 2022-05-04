@@ -13,7 +13,7 @@
 #' @param cex_outer Size of the text for the cell groups in the outer layer of
 #' the circos plot. Default is 0.5.
 #'
-#' @param cex_innter Size of the text for the ligand and receptors in the
+#' @param cex_inner Size of the text for the ligand and receptors in the
 #' inner layer of the circos plot. Default is 0.4.
 #'
 #' @return Generates a circos plot connecting ligands and receptors across cell types for a given sample group
