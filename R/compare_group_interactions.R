@@ -9,7 +9,7 @@
 #' @param sample_replicates Name of the meta.data column in a Seurat object that
 #' has the samples of the individual replicate samples
 #'
-#' @param sample_group Name of the meta.data column in a Seurat object that
+#' @param sample_groups Name of the meta.data column in a Seurat object that
 #' has the name of the sample group
 #'
 #' @param metadata_grouping Name of the meta.data column in a Seurat object that
@@ -34,6 +34,8 @@ compare_group_interactions <- function(seurat_object,
   sample_groups,
   metadata_grouping) {
 
+  cell_type1 <- cell_type2 <- ligand <- receptor <- sample_id <- `.`<- NULL
+
   interactions_compare <- id_interactions(interaction_stats)
 
   extracted_sample_groups <- extract_sample_group_replicates(seurat_object,sample_groups)
@@ -45,7 +47,7 @@ compare_group_interactions <- function(seurat_object,
   interaction_scores_frame <- cell_type_ligand_receptor_score(replicate_scores_frame,interactions_compare,
     extracted_sample_groups)
 
-  input_formula <- as.formula(paste("scores~sample_groups",sep=""))
+  input_formula <- stats::as.formula(paste("scores~sample_groups",sep=""))
 
   mod_res <- interaction_scores_frame %>%
     mutate(unique_group=paste(cell_type1,ligand,cell_type2,receptor,sep="_")) %>%

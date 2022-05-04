@@ -13,7 +13,7 @@
 #' @param cex_outer Size of the text for the cell groups in the outer layer of
 #' the circos plot. Default is 0.5.
 #'
-#' @param cex_innter Size of the text for the ligand and receptors in the
+#' @param cex_inner Size of the text for the ligand and receptors in the
 #' inner layer of the circos plot. Default is 0.4.
 #'
 #' @return Generates a circos plot connecting ligands and receptors across cell types for a given sample group
@@ -49,7 +49,8 @@ circos_plot <- function(ligand_receptor_frame,
 
   # Bind variables
   cell_type1 <- lig <- cell_type2 <- rec <- classes <- ranges <-
-    max_range <- to_class <- to_rec <- lig_rec <- ordered_lig_rec <- type <- NULL
+    max_range <- to_class <- to_rec <- lig_rec <- ordered_lig_rec <- type <-
+    lig.rec <- to.class <- to.rec <- ordered.lig.rec <- NULL
 
   # Reformat data
   part1 <- ligand_receptor_frame %>%

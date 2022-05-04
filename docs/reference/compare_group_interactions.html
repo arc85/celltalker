@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">celltalker</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
       </span>
     </div>
 
@@ -128,42 +128,49 @@
     </div>
 
     <pre class="usage"><span class='fu'>compare_group_interactions</span>(
-  <span class='no'>interactions_stats</span>,
+  <span class='no'>seurat_object</span>,
+  <span class='no'>interaction_stats</span>,
   <span class='no'>sample_replicates</span>,
-  <span class='no'>sample_group_1</span>,
-  <span class='no'>sample_group_2</span>
+  <span class='no'>sample_groups</span>,
+  <span class='no'>metadata_grouping</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>sample_replicates</th>
-      <td><p>Name of the meta.data column in a Seurat object that
-has the samples of the individual replicate samples</p></td>
-    </tr>
-    <tr>
-      <th>sample_group_1</th>
-      <td><p>The group of samples from which interactions will be
-identified for statistical comparison</p></td>
-    </tr>
-    <tr>
-      <th>sample_group_2</th>
-      <td><p>Comparitor group from which interactions from
-sample_group_1 will be measured against</p></td>
+      <th>seurat_object</th>
+      <td><p>Seurat object containing expression data acorss all
+samples and cells</p></td>
     </tr>
     <tr>
       <th>interaction_stats</th>
       <td><p>Tibble from celltalk function, usually filtered to
 the top significant ligand and receptor interactions of interest</p></td>
     </tr>
+    <tr>
+      <th>sample_replicates</th>
+      <td><p>Name of the meta.data column in a Seurat object that
+has the samples of the individual replicate samples</p></td>
+    </tr>
+    <tr>
+      <th>sample_groups</th>
+      <td><p>Name of the meta.data column in a Seurat object that
+has the name of the sample group</p></td>
+    </tr>
+    <tr>
+      <th>metadata_grouping</th>
+      <td><p>Name of the meta.data column in a Seurat object that
+has the name of the groups of cells to evaluate (e.g. "cell_types" containing
+previously identified cell types)</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data.frame contain ligands, receptors, cell types and the
-statistical significant of the joint means in sample_group_1 versus
-the joint means in sample_group_2</p>
+    <p>A list of linear models containing the coefficients and statistics for
+assessing differences in joint ligand and receptor expression between sample
+groups. Note that this requires replicate samples from each samples group.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

@@ -1,6 +1,6 @@
 Package: celltalker
 Title: Analysis of cell-cell communication from single-cell RNAseq data
-Version: 0.0.5.9000
+Version: 0.0.6.9000
 Authors@R:
     person(given = "Anthony",
            family = "Cillo",
@@ -19,9 +19,11 @@ Imports:
     circlize (>= 0.4.6),
     Matrix (>= 1.2-18),
     tibble (>= 3.0.5),
-    tidyr (>= 1.0.0)
-Suggests:
+    tidyr (>= 1.0.0),
     ggplot2 (>= 3.2.0),
+    purrr (>= 0.3.3),
+    rlang (>= 0.4.10)
+Suggests:
     knitr (>= 1.0),
     RColorBrewer (>= 1.1.0),
     rmarkdown (>= 1.0),

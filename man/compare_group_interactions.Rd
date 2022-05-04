@@ -5,29 +5,34 @@
 \title{Statistically compare interactions between groups of samples}
 \usage{
 compare_group_interactions(
-  interactions_stats,
+  seurat_object,
+  interaction_stats,
   sample_replicates,
-  sample_group_1,
-  sample_group_2
+  sample_groups,
+  metadata_grouping
 )
 }
 \arguments{
-\item{sample_replicates}{Name of the meta.data column in a Seurat object that
-has the samples of the individual replicate samples}
-
-\item{sample_group_1}{The group of samples from which interactions will be
-identified for statistical comparison}
-
-\item{sample_group_2}{Comparitor group from which interactions from
-sample_group_1 will be measured against}
+\item{seurat_object}{Seurat object containing expression data acorss all
+samples and cells}
 
 \item{interaction_stats}{Tibble from celltalk function, usually filtered to
 the top significant ligand and receptor interactions of interest}
+
+\item{sample_replicates}{Name of the meta.data column in a Seurat object that
+has the samples of the individual replicate samples}
+
+\item{sample_groups}{Name of the meta.data column in a Seurat object that
+has the name of the sample group}
+
+\item{metadata_grouping}{Name of the meta.data column in a Seurat object that
+has the name of the groups of cells to evaluate (e.g. "cell_types" containing
+previously identified cell types)}
 }
 \value{
-A data.frame contain ligands, receptors, cell types and the
-statistical significant of the joint means in sample_group_1 versus
-the joint means in sample_group_2
+A list of linear models containing the coefficients and statistics for
+assessing differences in joint ligand and receptor expression between sample
+groups. Note that this requires replicate samples from each samples group.
 }
 \description{
 Statistically compare interactions between groups of samples

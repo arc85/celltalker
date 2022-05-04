@@ -299,6 +299,7 @@ value <- interaction_pairs <- scram_mean <- scram_sd <- NULL
 #'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr mutate
+#' @importFrom rlang .data
 #'
 #' @keywords internal
 #' @noRd
@@ -308,7 +309,7 @@ id_interactions <- function(interactions_stats) {
   interactions_stats %>%
     mutate(ligand=sapply(strsplit(interaction,split="_"),function(x) x[[1]])) %>%
     mutate(receptor=sapply(strsplit(interaction,split="_"),function(x) x[[2]])) %>%
-    dplyr::select(cell_type1,cell_type2,ligand,receptor) %>%
+    dplyr::select(.data$cell_type1,.data$cell_type2,.data$ligand,.data$receptor) %>%
     data.frame()
 
 }
@@ -329,6 +330,8 @@ id_interactions <- function(interactions_stats) {
 
 extract_sample_group_replicates <- function(seurat_object,sample_groups) {
 
+  sample_id <- NULL
+  
   seurat_object@meta.data %>%
     dplyr::select(dplyr::all_of(sample_groups),sample_id) %>%
     dplyr::distinct() %>%
@@ -354,6 +357,8 @@ extract_sample_group_replicates <- function(seurat_object,sample_groups) {
 #' @param sample_group Seruat object containing expression data for the ligand
 #' receptor pair of interest and replicate samples in meta.data
 #'
+#' @importFrom rlang .data
+#'
 #' @return Generates a tibble containing the joint ligand receptor means across
 #' individual replicate samples in a sample group
 #'
@@ -362,16 +367,18 @@ extract_sample_group_replicates <- function(seurat_object,sample_groups) {
 
 cell_type_lig_rec_frame <- function(interactions_compare,seurat_object,sample_replicates,sample_groups,metadata_grouping) {
 
+  replicate_types <- NULL
+
   lig_rec_use <- unique(c(interactions_compare$ligand,interactions_compare$receptor))
   cell_types_use <- unique(c(interactions_compare$cell_type1,interactions_compare$cell_type2))
 
-  expr_dat <- GetAssayData(seurat_object,slot="data",assay="RNA") %>%
+  expr_dat <- Seurat::GetAssayData(seurat_object,slot="data",assay="RNA") %>%
     as.matrix() %>%
     t() %>%
-    as_tibble(.,rownames="cell_barcodes")
+    as_tibble(.data,rownames="cell_barcodes")
 
   meta_dat <- seurat_object@meta.data %>%
-    as_tibble(.,rownames="cell_barcodes")
+    as_tibble(.data,rownames="cell_barcodes")
 
   expr_meta <- left_join(expr_dat,meta_dat,by="cell_barcodes") %>%
     mutate(replicate_types=paste(.data[[sample_groups]],.data[[metadata_grouping]],.data[[sample_replicates]],sep=","))
@@ -425,6 +432,7 @@ cell_type_ligand_receptor_score <- function(replicate_scores_frame,
   interactions_compare,
   extracted_sample_groups) {
 
+cell_types <- sample_replicates <- sample_groups <- NULL
 interaction_scores <- list()
 
 for (i in 1:nrow(interactions_compare)) {
@@ -436,7 +444,7 @@ sample1 <- replicate_scores_frame %>%
   select(ligand,cell_types,sample_replicates,sample_groups) %>%
   filter(cell_types==interactions_compare[i,"cell_type1"])
 
-sample1 <- complete(sample1,cell_types,sample_replicates)
+sample1 <- tidyr::complete(sample1,cell_types,sample_replicates)
 sample1[is.na(sample1[,ligand]),ligand] <- 0
 sample1$sample_groups <- extracted_sample_groups
 
@@ -444,7 +452,7 @@ sample2 <- replicate_scores_frame %>%
   select(receptor,cell_types,sample_replicates,sample_groups) %>%
   filter(cell_types==interactions_compare[i,"cell_type2"])
 
-sample2 <- complete(sample2,cell_types,sample_replicates,fill=list(receptor=0))
+sample2 <- tidyr::complete(sample2,cell_types,sample_replicates,fill=list(receptor=0))
 sample2[is.na(sample2[,receptor]),receptor] <- 0
 sample2$sample_groups <- extracted_sample_groups
 

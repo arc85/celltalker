@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">celltalker</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
       </span>
     </div>
 
@@ -81,7 +81,7 @@
       <h1>Identify significantly different interactions across groups with replicate samples</h1>
                         <h4 class="author">Anthony R Cillo</h4>
             
-            <h4 class="date">12 April, 2022</h4>
+            <h4 class="date">03 May, 2022</h4>
       
       
       <div class="hidden name"><code>consistent_interactions.Rmd</code></div>
@@ -95,41 +95,34 @@
 <div id="load-packages-and-setup-analysis" class="section level2">
 <h2 class="hasAnchor">
 <a href="#load-packages-and-setup-analysis" class="anchor"></a>Load packages and setup analysis</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(celltalker)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Seurat)</span></code></pre></div>
-<pre><code>## This version of bslib is designed to work with shiny version 1.5.0.9007 or higher.</code></pre>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div>
-<pre><code>## Registered S3 method overwritten by 'cli':
-##   method     from    
-##   print.boxx spatstat</code></pre>
-<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
-<pre><code>## ✔ ggplot2 3.3.2     ✔ purrr   0.3.3
-## ✔ tibble  3.0.5     ✔ dplyr   1.0.3
-## ✔ tidyr   1.0.0     ✔ stringr 1.4.0
-## ✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
-<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()</code></pre>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"filtered_lig_rec"</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"overall_metadata"</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"overall_umap"</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Create a Seurat object based on 5 healthy donor PBMC and 5 healhy donor tonsils</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>ser_obj <span class="ot">&lt;-</span> <span class="fu">CreateSeuratObject</span>(filtered_lig_rec,<span class="at">meta.data=</span>overall_metadata)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>ser_obj[[<span class="st">"umap"</span>]] <span class="ot">&lt;-</span> <span class="fu">CreateDimReducObject</span>(<span class="at">embeddings =</span> overall_umap, <span class="at">key =</span> <span class="st">"UMAP_"</span>, <span class="at">assay =</span> <span class="fu">DefaultAssay</span>(ser_obj))</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">DimPlot</span>(ser_obj,<span class="at">group.by=</span><span class="st">"cell_types"</span>,<span class="at">split.by=</span><span class="st">"sample_type"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressMessages</span>({</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(celltalker)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Seurat)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(magrittr)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Load data provided with package</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"filtered_lig_rec"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"overall_metadata"</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"overall_umap"</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="do">## Create a Seurat object based on 5 healthy donor PBMC and 5 healhy donor tonsils</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>ser_obj <span class="ot">&lt;-</span> <span class="fu">CreateSeuratObject</span>(filtered_lig_rec,<span class="at">meta.data=</span>overall_metadata)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>ser_obj[[<span class="st">"umap"</span>]] <span class="ot">&lt;-</span> <span class="fu">CreateDimReducObject</span>(<span class="at">embeddings =</span> overall_umap, <span class="at">key =</span> <span class="st">"UMAP_"</span>, <span class="at">assay =</span> <span class="fu">DefaultAssay</span>(ser_obj))</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">DimPlot</span>(ser_obj,<span class="at">group.by=</span><span class="st">"cell_types"</span>,<span class="at">split.by=</span><span class="st">"sample_type"</span>)</span></code></pre></div>
 <p><img src="consistent_interactions_files/figure-html/setup-1.png" width="700"></p>
 </div>
 <div id="run-celltalker" class="section level2">
 <h2 class="hasAnchor">
 <a href="#run-celltalker" class="anchor"></a>Run celltalker</h2>
 <p>Next, we will split the data into PBMC and Tonsil Seurat objects and will identify the top ligand and receptor interactions in each of these datasets</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Split dataset</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>ser_split <span class="ot">&lt;-</span> <span class="fu">SplitObject</span>(ser_obj,<span class="at">split=</span><span class="st">"sample_type"</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Check out the split data</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>ser_split</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Split dataset</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ser_split <span class="ot">&lt;-</span> <span class="fu">SplitObject</span>(ser_obj,<span class="at">split=</span><span class="st">"sample_type"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Check out the split data</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>ser_split</span></code></pre></div>
 <pre><code>## $PBMC
 ## An object of class Seurat 
 ## 204 features across 10836 samples within 1 assay 
@@ -141,148 +134,186 @@
 ## 204 features across 12898 samples within 1 assay 
 ## Active assay: RNA (204 features, 0 variable features)
 ##  1 dimensional reduction calculated: umap</code></pre>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Run celltalker - PBMC</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>pbmc_interactions <span class="ot">&lt;-</span> <span class="fu">celltalk</span>(<span class="at">input_object=</span>ser_split[[<span class="st">"PBMC"</span>]],</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata_grouping=</span><span class="st">"cell_types"</span>,</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">ligand_receptor_pairs=</span>ramilowski_pairs,</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">number_cells_required=</span><span class="dv">50</span>,</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">min_expression=</span><span class="dv">1000</span>,</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_expression=</span><span class="dv">20000</span>,</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">scramble_times=</span><span class="dv">10</span>)</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Check out the interactions - PBMC</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>pbmc_interactions <span class="sc">%&gt;%</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_val_adj=</span><span class="fu">p.adjust</span>(p_val,<span class="at">method=</span><span class="st">"fdr"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p_val_adj<span class="sc">&lt;</span><span class="fl">0.05</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 9 x 10
-##   interaction_pai… interaction value scram_mean scram_sd   p_val cell_type1
-##   &lt;chr&gt;            &lt;chr&gt;       &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     
-## 1 CD14+CD16- mono… CD14_ITGB1  0.995     0.262    0.0536 0.      CD14+CD16…
-## 2 CD14+CD16- mono… CD14_ITGB1  0.963     0.251    0.0615 0.      CD14+CD16…
-## 3 CD14+CD16- mono… CD14_ITGB1  0.927     0.253    0.0758 0.      CD14+CD16…
-## 4 CD1C+ DCs_NK ce… GNAS_ADCY7  0.683     0.383    0.0843 1.89e-4 CD1C+ DCs 
-## 5 NK cells_CD14+C… HSP90B1_AS… 0.592     0.300    0.0779 8.65e-5 NK cells  
-## 6 CD14-CD16+ mono… ICAM2_ITGAL 0.531     0.219    0.0740 1.22e-5 CD14-CD16…
-## 7 CD14-CD16+ mono… LRPAP1_SOR… 0.452     0.337    0.0305 8.90e-5 CD14-CD16…
-## 8 CD14-CD16+ mono… TIMP1_CD63  1.43      0.801    0.153  2.10e-5 CD14-CD16…
-## 9 CD8 T cells_CD4… TNFSF12_TN… 0.180     0.0725   0.0197 2.06e-8 CD8 T cel…
-## # … with 3 more variables: cell_type2 &lt;chr&gt;, interact_ratio &lt;dbl&gt;,
-## #   p_val_adj &lt;dbl&gt;</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Run celltalker - Tonsil</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>tonsil_interactions <span class="ot">&lt;-</span> <span class="fu">celltalk</span>(<span class="at">input_object=</span>ser_split[[<span class="st">"Tonsil"</span>]],</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata_grouping=</span><span class="st">"cell_types"</span>,</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">ligand_receptor_pairs=</span>ramilowski_pairs,</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">number_cells_required=</span><span class="dv">50</span>,</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">min_expression=</span><span class="dv">1000</span>,</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_expression=</span><span class="dv">20000</span>,</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">scramble_times=</span><span class="dv">10</span>)</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Check out the interactions - tonsil</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>tonsil_interactions <span class="sc">%&gt;%</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_val_adj=</span><span class="fu">p.adjust</span>(p_val,<span class="at">method=</span><span class="st">"fdr"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p_val_adj<span class="sc">&lt;</span><span class="fl">0.05</span>)</span></code></pre></div>
-<pre><code>## # A tibble: 13 x 10
-##    interaction_pai… interaction value scram_mean scram_sd    p_val cell_type1
-##    &lt;chr&gt;            &lt;chr&gt;       &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;     
-##  1 B cells_NK cells ADAM28_ITG… 0.502     0.165   0.0951  2.01e- 4 B cells   
-##  2 NK cells_CD1C+ … APP_NCSTN   0.237     0.101   0.0404  3.48e- 4 NK cells  
-##  3 CD1C+ DCs_CD1C+… CALR_HLA-F  1.06      0.753   0.0910  3.69e- 4 CD1C+ DCs 
-##  4 CD8 T cells_B c… CCL5_CXCR3  1.67      0.230   0.195   8.42e-14 CD8 T cel…
-##  5 CD8 T cells_CD4… CCL5_CXCR3  1.69      0.222   0.185   1.33e-15 CD8 T cel…
-##  6 CD8 T cells_CD8… CCL5_CXCR3  1.96      0.395   0.480   5.50e- 4 CD8 T cel…
-##  7 CD4 T cells_Pla… CD40LG_TRA… 0.307     0.0584  0.00905 0.       CD4 T cel…
-##  8 CD1C+ DCs_CD8 T… GNAI2_CXCR3 0.784     0.289   0.123   2.99e- 5 CD1C+ DCs 
-##  9 CD1C+ DCs_CD1C+… IL16_CD4    0.568     0.321   0.0647  6.62e- 5 CD1C+ DCs 
-## 10 NK cells_CD1C+ … LTA_TNFRSF… 0.387     0.169   0.0498  5.69e- 6 NK cells  
-## 11 NK cells_CD1C+ … LTA_TNFRSF… 0.354     0.0881  0.0582  2.42e- 6 NK cells  
-## 12 B cells_Plasmab… LY86_CD180  0.522     0.0824  0.0798  1.80e- 8 B cells   
-## 13 NK cells_NK cel… TNFSF12_TN… 0.427     0.0829  0.0616  1.11e- 8 NK cells  
-## # … with 3 more variables: cell_type2 &lt;chr&gt;, interact_ratio &lt;dbl&gt;,
-## #   p_val_adj &lt;dbl&gt;</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Run celltalker - PBMC</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>pbmc_interactions <span class="ot">&lt;-</span> <span class="fu">celltalk</span>(<span class="at">input_object=</span>ser_split[[<span class="st">"PBMC"</span>]],</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata_grouping=</span><span class="st">"cell_types"</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">ligand_receptor_pairs=</span>ramilowski_pairs,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">number_cells_required=</span><span class="dv">50</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">min_expression=</span><span class="dv">50</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_expression=</span><span class="dv">20000</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">scramble_times=</span><span class="dv">10</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Check out the interactions - PBMC</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>pbmc_interactions <span class="sc">%&gt;%</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_val_adj=</span><span class="fu">p.adjust</span>(p_val,<span class="at">method=</span><span class="st">"fdr"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p_val_adj<span class="sc">&lt;</span><span class="fl">0.05</span>)</span></code></pre></div>
+<pre><code>## Registered S3 method overwritten by 'cli':
+##   method     from    
+##   print.boxx spatstat</code></pre>
+<pre><code>## # A tibble: 49 x 10
+##    interaction_pai… interaction value scram_mean scram_sd   p_val cell_type1
+##    &lt;chr&gt;            &lt;chr&gt;       &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     
+##  1 CD14+CD16- mono… ADAM17_ITG… 0.459     0.275    0.0373 4.40e-7 CD14+CD16…
+##  2 CD1C+ DCs_CD14+… ADAM28_ITG… 0.258     0.131    0.0294 7.75e-6 CD1C+ DCs 
+##  3 B cells_CD1C+ D… ADAM28_ITG… 0.414     0.152    0.0444 1.82e-9 B cells   
+##  4 CD14-CD16+ mono… BTLA_CD247  0.824     0.204    0.139  3.92e-6 CD14-CD16…
+##  5 CD14+CD16- mono… BTLA_TNFRS… 0.293     0.200    0.0208 4.48e-6 CD14+CD16…
+##  6 CD8 T cells_CD8… CALR_HLA-F  0.717     0.474    0.0726 4.06e-4 CD8 T cel…
+##  7 CD8 T cells_CD4… CCL5_CXCR3  1.12      0.0936   0.0281 0.      CD8 T cel…
+##  8 CD14+CD16- mono… CD14_ITGA4  0.854     0.183    0.0805 0.      CD14+CD16…
+##  9 CD14+CD16- mono… CD14_ITGA4  0.914     0.199    0.0814 0.      CD14+CD16…
+## 10 CD14+CD16- mono… CD14_ITGA4  0.945     0.196    0.0754 0.      CD14+CD16…
+## # … with 39 more rows, and 3 more variables: cell_type2 &lt;chr&gt;,
+## #   interact_ratio &lt;dbl&gt;, p_val_adj &lt;dbl&gt;</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Run celltalker - Tonsil</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>tonsil_interactions <span class="ot">&lt;-</span> <span class="fu">celltalk</span>(<span class="at">input_object=</span>ser_split[[<span class="st">"Tonsil"</span>]],</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata_grouping=</span><span class="st">"cell_types"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">ligand_receptor_pairs=</span>ramilowski_pairs,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">number_cells_required=</span><span class="dv">50</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">min_expression=</span><span class="dv">50</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_expression=</span><span class="dv">20000</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">scramble_times=</span><span class="dv">10</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Check out the interactions - tonsil</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>tonsil_interactions <span class="sc">%&gt;%</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_val_adj=</span><span class="fu">p.adjust</span>(p_val,<span class="at">method=</span><span class="st">"fdr"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p_val_adj<span class="sc">&lt;</span><span class="fl">0.05</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 50 x 10
+##    interaction_pai… interaction value scram_mean scram_sd   p_val cell_type1
+##    &lt;chr&gt;            &lt;chr&gt;       &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     
+##  1 B cells_CD1C+ D… ADAM28_ITG… 0.428     0.166    0.0681 6.03e-5 B cells   
+##  2 CD1C+ DCs_NK ce… CALR_HLA-F  1.12      0.800    0.0815 4.58e-5 CD1C+ DCs 
+##  3 CD1C+ DCs_NK ce… CD14_ITGA4  0.413     0.125    0.0611 1.17e-6 CD1C+ DCs 
+##  4 CD1C+ DCs_CD1C+… CD14_ITGA4  0.339     0.0942   0.0541 3.12e-6 CD1C+ DCs 
+##  5 CD1C+ DCs_CD1C+… CD14_ITGB1  0.450     0.217    0.0493 1.22e-6 CD1C+ DCs 
+##  6 CD4 T cells_B c… CD40LG_CD40 0.643     0.299    0.106  5.77e-4 CD4 T cel…
+##  7 CD4 T cells_B c… CD40LG_ITG… 0.286     0.0220   0.0164 0.      CD4 T cel…
+##  8 CD4 T cells_Pla… CD40LG_ITG… 0.277     0.0229   0.0156 0.      CD4 T cel…
+##  9 CD4 T cells_CD1… CD40LG_ITG… 0.304     0.0522   0.0805 8.88e-4 CD4 T cel…
+## 10 CD4 T cells_CD4… CD40LG_TRA… 0.319     0.0601   0.0138 0.      CD4 T cel…
+## # … with 40 more rows, and 3 more variables: cell_type2 &lt;chr&gt;,
+## #   interact_ratio &lt;dbl&gt;, p_val_adj &lt;dbl&gt;</code></pre>
 </div>
 <div id="create-circos-plots" class="section level2">
 <h2 class="hasAnchor">
 <a href="#create-circos-plots" class="anchor"></a>Create circos plots</h2>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot top 3 interactions - PBMC</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>top_stats_pbmc <span class="ot">&lt;-</span> pbmc_interactions <span class="sc">%&gt;%</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_val_adj=</span><span class="fu">p.adjust</span>(p_val,<span class="at">method=</span><span class="st">"fdr"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p_val_adj<span class="sc">&lt;</span><span class="fl">0.05</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cell_type1) <span class="sc">%&gt;%</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">3</span>,interact_ratio) <span class="sc">%&gt;%</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Assign colors to cell types</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>all_cell_types <span class="ot">&lt;-</span> <span class="fu">unique</span>(ser_obj[[<span class="st">"cell_types"</span>]][,<span class="dv">1</span>])</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>colors_use <span class="ot">&lt;-</span> <span class="fu">colorRampPalette</span>(RColorBrewer<span class="sc">::</span><span class="fu">brewer.pal</span>(<span class="at">n=</span><span class="dv">8</span>,<span class="st">"Set2"</span>))(<span class="fu">length</span>(all_cell_types))</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(colors_use) <span class="ot">&lt;-</span> all_cell_types</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressMessages</span>(</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="fu">circos_plot</span>(<span class="at">ligand_receptor_frame=</span>top_stats_pbmc,</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">cell_group_colors=</span>colors_use,</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">ligand_color=</span><span class="st">"blue"</span>,</span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">receptor_color=</span><span class="st">"red"</span>,</span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">cex_outer=</span><span class="fl">0.5</span>,</span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">cex_inner=</span><span class="fl">0.4</span>)</span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot top 3 interactions - PBMC</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Identify the top 3 interactions for cell_type1</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>top_stats_pbmc <span class="ot">&lt;-</span> pbmc_interactions <span class="sc">%&gt;%</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_val_adj=</span><span class="fu">p.adjust</span>(p_val,<span class="at">method=</span><span class="st">"fdr"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p_val_adj<span class="sc">&lt;</span><span class="fl">0.05</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cell_type1) <span class="sc">%&gt;%</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">10</span>,interact_ratio) <span class="sc">%&gt;%</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Assign colors to cell types</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>all_cell_types <span class="ot">&lt;-</span> <span class="fu">unique</span>(ser_obj[[<span class="st">"cell_types"</span>]][,<span class="dv">1</span>])</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Define colors</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>colors_use <span class="ot">&lt;-</span> <span class="fu">colorRampPalette</span>(RColorBrewer<span class="sc">::</span><span class="fu">brewer.pal</span>(<span class="at">n=</span><span class="dv">8</span>,<span class="st">"Set2"</span>))(<span class="fu">length</span>(all_cell_types))</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(colors_use) <span class="ot">&lt;-</span> all_cell_types</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Suppress messages to silence the circlize functions</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressMessages</span>(</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="fu">circos_plot</span>(<span class="at">ligand_receptor_frame=</span>top_stats_pbmc,</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">cell_group_colors=</span>colors_use,</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">ligand_color=</span><span class="st">"blue"</span>,</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">receptor_color=</span><span class="st">"red"</span>,</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">cex_outer=</span><span class="fl">0.5</span>,</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">cex_inner=</span><span class="fl">0.4</span>)</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p><img src="consistent_interactions_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot top 3 interactions - Tonsil</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>top_stats_tonsil <span class="ot">&lt;-</span> tonsil_interactions <span class="sc">%&gt;%</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_val_adj=</span><span class="fu">p.adjust</span>(p_val,<span class="at">method=</span><span class="st">"fdr"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p_val_adj<span class="sc">&lt;</span><span class="fl">0.05</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cell_type1) <span class="sc">%&gt;%</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">3</span>,interact_ratio) <span class="sc">%&gt;%</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressMessages</span>(</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="fu">circos_plot</span>(<span class="at">ligand_receptor_frame=</span>top_stats_tonsil,</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">cell_group_colors=</span>colors_use,</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">ligand_color=</span><span class="st">"blue"</span>,</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">receptor_color=</span><span class="st">"red"</span>,</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">cex_outer=</span><span class="fl">0.5</span>,</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">cex_inner=</span><span class="fl">0.4</span>)</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot top 3 interactions - Tonsil</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Identify the top 3 interactions for cell_type1</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>top_stats_tonsil <span class="ot">&lt;-</span> tonsil_interactions <span class="sc">%&gt;%</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_val_adj=</span><span class="fu">p.adjust</span>(p_val,<span class="at">method=</span><span class="st">"fdr"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p_val_adj<span class="sc">&lt;</span><span class="fl">0.05</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cell_type1) <span class="sc">%&gt;%</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">10</span>,interact_ratio) <span class="sc">%&gt;%</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Suppress messages to silence the circlize functions</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressMessages</span>(</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="fu">circos_plot</span>(<span class="at">ligand_receptor_frame=</span>top_stats_tonsil,</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">cell_group_colors=</span>colors_use,</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">ligand_color=</span><span class="st">"blue"</span>,</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">receptor_color=</span><span class="st">"red"</span>,</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">cex_outer=</span><span class="fl">0.5</span>,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">cex_inner=</span><span class="fl">0.4</span>)</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p><img src="consistent_interactions_files/figure-html/unnamed-chunk-2-2.png" width="700"></p>
 </div>
 <div id="identify-significantly-different-interactions-across-patient-samples" class="section level2">
 <h2 class="hasAnchor">
 <a href="#identify-significantly-different-interactions-across-patient-samples" class="anchor"></a>Identify significantly different interactions across patient samples</h2>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Split Seurat object into lists</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>ser_obj_list <span class="ot">&lt;-</span> <span class="fu">SplitObject</span>(ser_obj,<span class="at">split=</span><span class="st">"sample_type"</span>)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate significance of interactions across replicates</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>consistent_tonsil_interactions <span class="ot">&lt;-</span>  <span class="fu">compare_group_interactions</span>(</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">interactions_stats=</span>top_stats_tonsil,</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_replicates=</span><span class="st">"sample_id"</span>,</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_group_1=</span>ser_obj_list[[<span class="st">"Tonsil"</span>]],</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_group_2=</span>ser_obj_list[[<span class="st">"PBMC"</span>]])</span></code></pre></div>
-<pre><code>## Warning in wilcox.test.default(score1, score2): cannot compute exact p-value
-## with ties
-
-## Warning in wilcox.test.default(score1, score2): cannot compute exact p-value
-## with ties</code></pre>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Significant interactions with type I error control with FDR</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>consistent_tonsil_interactions <span class="sc">%&gt;%</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_val_adj=</span><span class="fu">p.adjust</span>(p_value,<span class="at">method=</span><span class="st">"fdr"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p_val_adj<span class="sc">&lt;</span><span class="fl">0.05</span>)</span></code></pre></div>
-<pre><code>##    cell_type1   cell_type2 ligand receptor mean_group1 mean_group2     p_value
-## 1   CD1C+ DCs    CD1C+ DCs   CALR    HLA-F   1.3970461   0.6879709 0.007936508
-## 2 CD4 T cells Plasmablasts CD40LG    TRAF3   0.5648783   0.2022593 0.007936508
-## 3    NK cells    CD1C+ DCs    LTA TNFRSF1B   0.2888214   0.0114413 0.007936508
-## 4     B cells Plasmablasts   LY86    CD180   0.9367137   0.3763581 0.011925234
-##    p_val_adj
-## 1 0.03174603
-## 2 0.03174603
-## 3 0.03174603
-## 4 0.03577570</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Boxplot of joint weight interaction across replicates</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot_group_interaction</span>(<span class="at">ligand=</span><span class="st">"CD40LG"</span>,</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">receptor=</span><span class="st">"TRAF3"</span>,</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cell_type1=</span><span class="st">"CD4 T cells"</span>,</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cell_type2=</span><span class="st">"Plasmablasts"</span>,</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_replicates=</span><span class="st">"sample_id"</span>,</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_group_1=</span>ser_split[[<span class="st">"Tonsil"</span>]],</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_group_2=</span>ser_split[[<span class="st">"PBMC"</span>]])</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Comparison of group interactions</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Use top 10 interactions from tonsils as input</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>group_stats <span class="ot">&lt;-</span> <span class="fu">compare_group_interactions</span>(<span class="at">seurat_object=</span>ser_obj,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">interaction_stats=</span>top_stats_tonsil,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_replicates=</span><span class="st">"sample_id"</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_groups=</span><span class="st">"sample_type"</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata_grouping=</span><span class="st">"cell_types"</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract p values into data.frame and add FDR</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>mod_p_vals <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(group_stats,<span class="cf">function</span>(x) {</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">class</span>(x) <span class="sc">!=</span> <span class="st">"lm"</span>) <span class="fu">stop</span>(<span class="st">"Not an object of class 'lm' "</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    f <span class="ot">&lt;-</span> <span class="fu">summary</span>(x)<span class="sc">$</span>fstatistic</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    p <span class="ot">&lt;-</span> <span class="fu">pf</span>(f[<span class="dv">1</span>],f[<span class="dv">2</span>],f[<span class="dv">3</span>],<span class="at">lower.tail=</span>F)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">attributes</span>(p) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(p)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>mod_p_vals <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(mod_p_vals,<span class="at">p_val_adj=</span><span class="fu">p.adjust</span>(mod_p_vals[,<span class="dv">1</span>],<span class="at">method=</span><span class="st">"fdr"</span>))</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>mod_p_vals</span></code></pre></div>
+<pre><code>##                                            mod_p_vals    p_val_adj
+## B cells_ADAM28_CD1C+ DCs_ITGA4           5.287926e-01 0.6624456605
+## B cells_PTDSS1_CD8 T cells_JMJD6         2.497048e-01 0.3706388400
+## CD1C+ DCs_CD14_CD1C+ DCs_ITGA4           8.455559e-01 0.9248267968
+## CD1C+ DCs_ICAM1_B cells_IL2RA            3.715232e-02 0.0812706980
+## CD1C+ DCs_ICAM1_CD1C+ DCs_ITGAX          5.266535e-01 0.6624456605
+## CD1C+ DCs_ICAM1_CD4 T cells_IL2RA        4.203750e-02 0.0846563895
+## CD1C+ DCs_ICAM1_NK cells_IL2RA           3.378335e-03 0.0090955171
+## CD1C+ DCs_ICAM1_NK cells_ITGAL           8.902670e-01 0.9422707383
+## CD1C+ DCs_LYZ_B cells_ITGAL              2.541523e-01 0.3706388400
+## CD1C+ DCs_LYZ_NK cells_ITGAL             8.350392e-02 0.1461318650
+## CD1C+ DCs_TNFSF12_B cells_TNFRSF25       1.295997e-01 0.2159995750
+## CD1C+ DCs_TNFSF13B_Plasmablasts_TNFRSF17 5.299565e-01 0.6624456605
+## CD4 T cells_CD40LG_B cells_CD40          1.716823e-03 0.0054626178
+## CD4 T cells_CD40LG_B cells_ITGAM         3.051935e-03 0.0089014766
+## CD4 T cells_CD40LG_CD1C+ DCs_ITGAM       1.087969e-03 0.0038078921
+## CD4 T cells_CD40LG_CD4 T cells_TRAF3     9.402560e-05 0.0008592326
+## CD4 T cells_CD40LG_Plasmablasts_ITGAM    2.182434e-04 0.0010745505
+## CD4 T cells_IL23A_NK cells_IL12RB1       9.832068e-01 0.9832068431
+## CD4 T cells_SEMA4D_B cells_CD72          7.343167e-01 0.8290672535
+## CD4 T cells_TNF_CD1C+ DCs_TNFRSF1B       9.153487e-01 0.9422707383
+## CD8 T cells_IL16_CD1C+ DCs_CD4           1.560372e-02 0.0390093124
+## CD8 T cells_SEMA4D_B cells_CD72          6.930776e-01 0.8085905084
+## CD8 T cells_TNF_CD1C+ DCs_TNFRSF1A       3.630891e-01 0.5083247269
+## NK cells_GZMB_CD1C+ DCs_PGRMC1           2.616099e-04 0.0010745505
+## NK cells_GZMB_CD8 T cells_IGF2R          2.648074e-04 0.0010745505
+## NK cells_GZMB_NK cells_IGF2R             2.763130e-04 0.0010745505
+## NK cells_LTA_CD1C+ DCs_TNFRSF1A          3.348573e-02 0.0781333685
+## NK cells_LTA_CD1C+ DCs_TNFRSF1B          4.353757e-02 0.0846563895
+## NK cells_LY86_B cells_CD180              7.454519e-02 0.1373200843
+## NK cells_PSEN1_CD1C+ DCs_NCSTN           2.361371e-01 0.3706388400
+## NK cells_SPON2_CD4 T cells_ITGAM         9.147412e-05 0.0008592326
+## NK cells_SPON2_NK cells_ITGAM            6.781877e-05 0.0008592326
+## NK cells_SPON2_Plasmablasts_ITGAM        9.819802e-05 0.0008592326
+## Plasmablasts_HSP90B1_NK cells_TLR1       5.827913e-01 0.7033688365
+## Plasmablasts_TNFSF12_NK cells_TNFRSF25   1.699910e-04 0.0010745505</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Boxplot of joint weight interaction across replicates</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot_group_interaction</span>(<span class="at">seurat_object=</span>ser_obj,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">interaction_stats=</span>top_stats_tonsil,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_replicates=</span><span class="st">"sample_id"</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_groups=</span><span class="st">"sample_type"</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata_grouping=</span><span class="st">"cell_types"</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">ligand=</span><span class="st">"CD40LG"</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">receptor=</span><span class="st">"CD40"</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">cell_type1=</span><span class="st">"CD4 T cells"</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">cell_type2=</span><span class="st">"B cells"</span>)</span></code></pre></div>
 <p><img src="consistent_interactions_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 </div>
   </div>

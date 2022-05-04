@@ -16,10 +16,14 @@ The data preprocessing steps are documented in the data-raw directory. We will s
 ## Load packages and setup analysis
 
 ```{r setup}
+suppressMessages({
 library(celltalker)
 library(Seurat)
-library(tidyverse)
+library(dplyr)
+library(magrittr)
+})
 
+## Load data provided with package
 data("filtered_lig_rec")
 data("overall_metadata")
 data("overall_umap")
@@ -49,7 +53,7 @@ pbmc_interactions <- celltalk(input_object=ser_split[["PBMC"]],
   metadata_grouping="cell_types",
   ligand_receptor_pairs=ramilowski_pairs,
   number_cells_required=50,
-  min_expression=1000,
+  min_expression=50,
   max_expression=20000,
   scramble_times=10)
 
@@ -63,7 +67,7 @@ tonsil_interactions <- celltalk(input_object=ser_split[["Tonsil"]],
   metadata_grouping="cell_types",
   ligand_receptor_pairs=ramilowski_pairs,
   number_cells_required=50,
-  min_expression=1000,
+  min_expression=50,
   max_expression=20000,
   scramble_times=10)
 
@@ -79,19 +83,22 @@ tonsil_interactions %>%
 ```{r}
 
 ## Plot top 3 interactions - PBMC
+# Identify the top 3 interactions for cell_type1
 top_stats_pbmc <- pbmc_interactions %>%
   mutate(p_val_adj=p.adjust(p_val,method="fdr")) %>%
   filter(p_val_adj<0.05) %>%
   group_by(cell_type1) %>%
-  top_n(3,interact_ratio) %>%
+  top_n(10,interact_ratio) %>%
   ungroup()
 
 # Assign colors to cell types
 all_cell_types <- unique(ser_obj[["cell_types"]][,1])
 
+# Define colors
 colors_use <- colorRampPalette(RColorBrewer::brewer.pal(n=8,"Set2"))(length(all_cell_types))
 names(colors_use) <- all_cell_types
 
+# Suppress messages to silence the circlize functions
 suppressMessages(
 circos_plot(ligand_receptor_frame=top_stats_pbmc,
   cell_group_colors=colors_use,
@@ -102,13 +109,15 @@ circos_plot(ligand_receptor_frame=top_stats_pbmc,
 )
 
 ## Plot top 3 interactions - Tonsil
+# Identify the top 3 interactions for cell_type1
 top_stats_tonsil <- tonsil_interactions %>%
   mutate(p_val_adj=p.adjust(p_val,method="fdr")) %>%
   filter(p_val_adj<0.05) %>%
   group_by(cell_type1) %>%
-  top_n(3,interact_ratio) %>%
+  top_n(10,interact_ratio) %>%
   ungroup()
 
+# Suppress messages to silence the circlize functions
 suppressMessages(
 circos_plot(ligand_receptor_frame=top_stats_tonsil,
   cell_group_colors=colors_use,
@@ -124,28 +133,38 @@ circos_plot(ligand_receptor_frame=top_stats_tonsil,
 
 ```{r}
 
-# Split Seurat object into lists
-ser_obj_list <- SplitObject(ser_obj,split="sample_type")
-
-# Evaluate significance of interactions across replicates
-consistent_tonsil_interactions <-  compare_group_interactions(
-  interactions_stats=top_stats_tonsil,
+## Comparison of group interactions
+# Use top 10 interactions from tonsils as input
+group_stats <- compare_group_interactions(seurat_object=ser_obj,
+  interaction_stats=top_stats_tonsil,
   sample_replicates="sample_id",
-  sample_group_1=ser_obj_list[["Tonsil"]],
-  sample_group_2=ser_obj_list[["PBMC"]])
+  sample_groups="sample_type",
+  metadata_grouping="cell_types")
 
-# Significant interactions with type I error control with FDR
-consistent_tonsil_interactions %>%
-  mutate(p_val_adj=p.adjust(p_value,method="fdr")) %>%
-  filter(p_val_adj<0.05)
+# Extract p values into data.frame and add FDR
+mod_p_vals <- do.call(rbind,
+  lapply(group_stats,function(x) {
+    if (class(x) != "lm") stop("Not an object of class 'lm' ")
+    f <- summary(x)$fstatistic
+    p <- pf(f[1],f[2],f[3],lower.tail=F)
+    attributes(p) <- NULL
+    return(p)
+  })
+)
+
+mod_p_vals <- data.frame(mod_p_vals,p_val_adj=p.adjust(mod_p_vals[,1],method="fdr"))
+
+mod_p_vals
 
 # Boxplot of joint weight interaction across replicates
-boxplot_group_interaction(ligand="CD40LG",
-  receptor="TRAF3",
-  cell_type1="CD4 T cells",
-  cell_type2="Plasmablasts",
+boxplot_group_interaction(seurat_object=ser_obj,
+  interaction_stats=top_stats_tonsil,
   sample_replicates="sample_id",
-  sample_group_1=ser_split[["Tonsil"]],
-  sample_group_2=ser_split[["PBMC"]])
+  sample_groups="sample_type",
+  metadata_grouping="cell_types",
+  ligand="CD40LG",
+  receptor="CD40",
+  cell_type1="CD4 T cells",
+  cell_type2="B cells")
 
 ```

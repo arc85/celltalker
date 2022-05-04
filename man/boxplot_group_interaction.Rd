@@ -6,32 +6,43 @@
 interaction between two groups of samples}
 \usage{
 boxplot_group_interaction(
+  seurat_object,
+  interaction_stats,
+  sample_replicates,
+  sample_groups,
+  metadata_grouping,
   ligand,
   receptor,
   cell_type1,
-  cell_type2,
-  sample_replicates,
-  sample_group_1,
-  sample_group_2
+  cell_type2
 )
 }
 \arguments{
-\item{ligand}{Ligand of interest}
+\item{seurat_object}{Seurat object containing expression levels across all
+cells and sample types}
 
-\item{receptor}{Receptor of interest}
-
-\item{cell_type1}{Cell type expressing the ligand of interest}
-
-\item{cell_type2}{Cell type expressiong the receptor of interest}
+\item{interaction_stats}{Tibble from celltalk function, usually filtered to
+the top significant ligand and receptor interactions of interest}
 
 \item{sample_replicates}{Name of the meta.data column in a Seurat object that
 has the samples of the individual replicate samples}
 
-\item{sample_group_1}{The group of samples from which interactions will be
-identified for statistical comparison}
+\item{sample_groups}{Name of the meta.data column in a Seurat object that
+has the name of the sample group}
 
-\item{sample_group_2}{Comparitor group from which interactions from
-sample_group_1 will be measured against}
+\item{metadata_grouping}{Name of the meta.data column in a Seurat object that
+has the name of the groups of cells to evaluate (e.g. "cell_types" containing
+previously identified cell types)}
+
+\item{ligand}{Name of the ligand in the ligand/receptor pair of interest}
+
+\item{receptor}{Name of the receptor in the ligand/receptor pair of interest}
+
+\item{cell_type1}{Name of the cell type expressing the ligand in the ligand/
+receptor pair of interest}
+
+\item{cell_type2}{Name of the cell type expressing the receptor in the ligand/
+receptor pair of interest}
 }
 \value{
 A ggplot boxplot of the joint mean for a ligand/receptor interaction

@@ -12,12 +12,13 @@
 #' @param sample_replicates Name of the meta.data column in a Seurat object that
 #' has the samples of the individual replicate samples
 #'
-#' @param sample_group Name of the meta.data column in a Seurat object that
+#' @param sample_groups Name of the meta.data column in a Seurat object that
 #' has the name of the sample group
 #'
 #' @param metadata_grouping Name of the meta.data column in a Seurat object that
 #' has the name of the groups of cells to evaluate (e.g. "cell_types" containing
 #' previously identified cell types)
+#'
 #' @param ligand Name of the ligand in the ligand/receptor pair of interest
 #'
 #' @param receptor Name of the receptor in the ligand/receptor pair of interest
@@ -45,6 +46,8 @@ boxplot_group_interaction <- function(seurat_object,
   cell_type1,
   cell_type2) {
 
+    `Sample group` <- scores <- `.` <- NULL
+
     interactions_compare <- id_interactions(interaction_stats)
 
     extracted_sample_groups <- extract_sample_group_replicates(seurat_object,sample_groups)
@@ -59,6 +62,8 @@ boxplot_group_interaction <- function(seurat_object,
     interaction_scores_frame %>%
       filter(cell_type1=={{cell_type1}}) %>%
       filter(cell_type2=={{cell_type2}}) %>%
+      filter(ligand=={{ligand}}) %>%
+      filter(receptor=={{receptor}}) %>%
       mutate(`Sample group`=sample_groups) %>%
       ggplot(.,aes(x=`Sample group`,y=scores,colour=`Sample group`)) +
         geom_boxplot(outlier.shape=NA) +
