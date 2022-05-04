@@ -22,12 +22,12 @@ the top significant ligand and receptor interactions of interest}
 \item{sample_replicates}{Name of the meta.data column in a Seurat object that
 has the samples of the individual replicate samples}
 
+\item{sample_groups}{Name of the meta.data column in a Seurat object that
+has the name of the sample group}
+
 \item{metadata_grouping}{Name of the meta.data column in a Seurat object that
 has the name of the groups of cells to evaluate (e.g. "cell_types" containing
 previously identified cell types)}
-
-\item{sample_group}{Name of the meta.data column in a Seurat object that
-has the name of the sample group}
 }
 \value{
 A list of linear models containing the coefficients and statistics for
