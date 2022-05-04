@@ -72,7 +72,7 @@ interaction between two groups of samples" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">celltalker</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
       </span>
     </div>
 
@@ -133,33 +133,29 @@ interaction between two groups of samples</p>
     </div>
 
     <pre class="usage"><span class='fu'>boxplot_group_interaction</span>(
+  <span class='no'>seurat_object</span>,
+  <span class='no'>interaction_stats</span>,
+  <span class='no'>sample_replicates</span>,
+  <span class='no'>sample_groups</span>,
+  <span class='no'>metadata_grouping</span>,
   <span class='no'>ligand</span>,
   <span class='no'>receptor</span>,
   <span class='no'>cell_type1</span>,
-  <span class='no'>cell_type2</span>,
-  <span class='no'>sample_replicates</span>,
-  <span class='no'>sample_group_1</span>,
-  <span class='no'>sample_group_2</span>
+  <span class='no'>cell_type2</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>ligand</th>
-      <td><p>Ligand of interest</p></td>
+      <th>seurat_object</th>
+      <td><p>Seurat object containing expression levels across all
+cells and sample types</p></td>
     </tr>
     <tr>
-      <th>receptor</th>
-      <td><p>Receptor of interest</p></td>
-    </tr>
-    <tr>
-      <th>cell_type1</th>
-      <td><p>Cell type expressing the ligand of interest</p></td>
-    </tr>
-    <tr>
-      <th>cell_type2</th>
-      <td><p>Cell type expressiong the receptor of interest</p></td>
+      <th>interaction_stats</th>
+      <td><p>Tibble from celltalk function, usually filtered to
+the top significant ligand and receptor interactions of interest</p></td>
     </tr>
     <tr>
       <th>sample_replicates</th>
@@ -167,14 +163,33 @@ interaction between two groups of samples</p>
 has the samples of the individual replicate samples</p></td>
     </tr>
     <tr>
-      <th>sample_group_1</th>
-      <td><p>The group of samples from which interactions will be
-identified for statistical comparison</p></td>
+      <th>sample_groups</th>
+      <td><p>Name of the meta.data column in a Seurat object that
+has the name of the sample group</p></td>
     </tr>
     <tr>
-      <th>sample_group_2</th>
-      <td><p>Comparitor group from which interactions from
-sample_group_1 will be measured against</p></td>
+      <th>metadata_grouping</th>
+      <td><p>Name of the meta.data column in a Seurat object that
+has the name of the groups of cells to evaluate (e.g. "cell_types" containing
+previously identified cell types)</p></td>
+    </tr>
+    <tr>
+      <th>ligand</th>
+      <td><p>Name of the ligand in the ligand/receptor pair of interest</p></td>
+    </tr>
+    <tr>
+      <th>receptor</th>
+      <td><p>Name of the receptor in the ligand/receptor pair of interest</p></td>
+    </tr>
+    <tr>
+      <th>cell_type1</th>
+      <td><p>Name of the cell type expressing the ligand in the ligand/
+receptor pair of interest</p></td>
+    </tr>
+    <tr>
+      <th>cell_type2</th>
+      <td><p>Name of the cell type expressing the receptor in the ligand/
+receptor pair of interest</p></td>
     </tr>
     </table>
 

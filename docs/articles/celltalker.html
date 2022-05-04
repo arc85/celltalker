@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">celltalker</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6.9000</span>
       </span>
     </div>
 
@@ -81,7 +81,7 @@
       <h1>celltalker</h1>
                         <h4 class="author">Anthony R Cillo</h4>
             
-            <h4 class="date">12 April, 2022</h4>
+            <h4 class="date">03 May, 2022</h4>
       
       
       <div class="hidden name"><code>celltalker.Rmd</code></div>
@@ -102,26 +102,27 @@
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">suppressWarnings</span>(</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(SeuratData)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Load Human Cell Atlast Bone Marrow from SeuratData</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(hcabm40k)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter cell and assign cell types to the dataset</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># NB: hca_bm_umap_cell_types has cell types and UMAP embeddings</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>hca_bm <span class="ot">&lt;-</span> hcabm40k[,<span class="fu">rownames</span>(hca_bm_umap_cell_types)]</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>hca_bm[[<span class="st">"cell_types"</span>]] <span class="ot">&lt;-</span> hca_bm_umap_cell_types<span class="sc">$</span>cell_types</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Process data</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>hca_bm <span class="ot">&lt;-</span> <span class="fu">NormalizeData</span>(hca_bm)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Add UMAP coordinates</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>hca_bm[[<span class="st">"umap"</span>]] <span class="ot">&lt;-</span> <span class="fu">CreateDimReducObject</span>(<span class="at">embeddings=</span><span class="fu">as.matrix</span>(hca_bm_umap_cell_types[,<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]),</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">key=</span><span class="st">"UMAP_"</span>,<span class="at">assay=</span><span class="st">"RNA"</span>)</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># View cell types</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="fu">DimPlot</span>(hca_bm,<span class="at">group.by=</span><span class="st">"cell_types"</span>)</span></code></pre></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(dplyr)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(magrittr)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Load Human Cell Atlast Bone Marrow from SeuratData</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(hcabm40k)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter cell and assign cell types to the dataset</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># NB: hca_bm_umap_cell_types has cell types and UMAP embeddings</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>hca_bm <span class="ot">&lt;-</span> hcabm40k[,<span class="fu">rownames</span>(hca_bm_umap_cell_types)]</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>hca_bm[[<span class="st">"cell_types"</span>]] <span class="ot">&lt;-</span> hca_bm_umap_cell_types<span class="sc">$</span>cell_types</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Process data</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>hca_bm <span class="ot">&lt;-</span> <span class="fu">NormalizeData</span>(hca_bm)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Add UMAP coordinates</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>hca_bm[[<span class="st">"umap"</span>]] <span class="ot">&lt;-</span> <span class="fu">CreateDimReducObject</span>(<span class="at">embeddings=</span><span class="fu">as.matrix</span>(hca_bm_umap_cell_types[,<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]),</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">key=</span><span class="st">"UMAP_"</span>,<span class="at">assay=</span><span class="st">"RNA"</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># View cell types</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="fu">DimPlot</span>(hca_bm,<span class="at">group.by=</span><span class="st">"cell_types"</span>)</span></code></pre></div>
 <p><img src="celltalker_files/figure-html/setup-1.png" width="700"></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Run celltalker</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>hca_bm_interactions <span class="ot">&lt;-</span> <span class="fu">celltalk</span>(<span class="at">input_object=</span>hca_bm,</span>
