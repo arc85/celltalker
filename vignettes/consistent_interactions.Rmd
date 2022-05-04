@@ -19,7 +19,8 @@ The data preprocessing steps are documented in the data-raw directory. We will s
 suppressMessages({
 library(celltalker)
 library(Seurat)
-library(tidyverse)
+library(dplyr)
+library(magrittr)
 })
 
 ## Load data provided with package
