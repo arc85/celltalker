@@ -328,15 +328,15 @@ id_interactions <- function(interactions_stats) {
 #' @keywords internal
 #' @noRd
 
-extract_sample_group_replicates <- function(seurat_object,sample_groups) {
+extract_sample_group_replicates <- function(seurat_object,sample_groups,sample_replicates) {
 
-  sample_id <- NULL
-  
-  seurat_object@meta.data %>%
-    dplyr::select(dplyr::all_of(sample_groups),sample_id) %>%
-    dplyr::distinct() %>%
-    dplyr::select(dplyr::all_of(sample_groups)) %>%
-    pull()
+  sample_group_frame <- seurat_object@meta.data %>%
+    dplyr::select(dplyr::all_of(sample_groups),dplyr::all_of(sample_replicates)) %>%
+    dplyr::distinct()
+
+  rownames(sample_group_frame) <- NULL
+
+  return(sample_group_frame)
 
 }
 
@@ -430,9 +430,11 @@ cell_type_lig_rec_frame <- function(interactions_compare,seurat_object,sample_re
 
 cell_type_ligand_receptor_score <- function(replicate_scores_frame,
   interactions_compare,
-  extracted_sample_groups) {
+  extracted_sample_groups,
+  sample_replicates,
+  sample_groups) {
 
-cell_types <- sample_replicates <- sample_groups <- NULL
+cell_types <- NULL
 interaction_scores <- list()
 
 for (i in 1:nrow(interactions_compare)) {
@@ -441,23 +443,25 @@ ligand <- interactions_compare[i,"ligand"]
 receptor <- interactions_compare[i,"receptor"]
 
 sample1 <- replicate_scores_frame %>%
-  select(ligand,cell_types,sample_replicates,sample_groups) %>%
+  select(all_of(ligand),cell_types,sample_replicates,sample_groups) %>%
   filter(cell_types==interactions_compare[i,"cell_type1"])
+colnames(sample1)[c(3,4)] <- c(sample_replicates,sample_groups)
 
-sample1 <- tidyr::complete(sample1,cell_types,sample_replicates)
+sample1 <- suppressMessages(left_join(extracted_sample_groups,sample1,by=c(.data[[sample_groups]],.data[[sample_replicates]])))
 sample1[is.na(sample1[,ligand]),ligand] <- 0
-sample1$sample_groups <- extracted_sample_groups
+sample1[is.na(sample1[,"cell_types"]),"cell_types"] <- sample1$cell_types[1]
 
 sample2 <- replicate_scores_frame %>%
-  select(receptor,cell_types,sample_replicates,sample_groups) %>%
+  select(all_of(receptor),cell_types,sample_replicates,sample_groups) %>%
   filter(cell_types==interactions_compare[i,"cell_type2"])
+colnames(sample2)[c(3,4)] <- c(sample_replicates,sample_groups)
 
-sample2 <- tidyr::complete(sample2,cell_types,sample_replicates,fill=list(receptor=0))
+sample2 <- suppressMessages(left_join(extracted_sample_groups,sample2,by=c(.data[[sample_groups]],.data[[sample_replicates]])))
 sample2[is.na(sample2[,receptor]),receptor] <- 0
-sample2$sample_groups <- extracted_sample_groups
+sample2[is.na(sample2[,"cell_types"]),"cell_types"] <- sample2$cell_types[1]
 
 sample_score <- data.frame((sample1[,3] + sample2[,3]) / 2,
-  sample_groups=sample1$sample_groups,
+  sample_groups=sample1[,sample_groups],
   cell_type1=interactions_compare[i,"cell_type1"],
   cell_type2=interactions_compare[i,"cell_type2"],
   ligand=interactions_compare[i,"ligand"],
