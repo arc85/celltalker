@@ -34,18 +34,18 @@ compare_group_interactions <- function(seurat_object,
   sample_groups,
   metadata_grouping) {
 
-  cell_type1 <- cell_type2 <- ligand <- receptor <- sample_id <- `.`<- NULL
+  cell_type1 <- cell_type2 <- ligand <- receptor <- `.`<- NULL
 
   interactions_compare <- id_interactions(interaction_stats)
 
-  extracted_sample_groups <- extract_sample_group_replicates(seurat_object,sample_groups)
+  extracted_sample_groups <- extract_sample_group_replicates(seurat_object,sample_groups,sample_replicates)
 
   replicate_scores_frame <- cell_type_lig_rec_frame(interactions_compare,seurat_object,sample_replicates,sample_groups,metadata_grouping)
   # Replace dots with dashes in column names e.g. HLA.F should be HLA-F
   colnames(replicate_scores_frame) <- gsub("\\.","-",colnames(replicate_scores_frame))
 
   interaction_scores_frame <- cell_type_ligand_receptor_score(replicate_scores_frame,interactions_compare,
-    extracted_sample_groups)
+    extracted_sample_groups,sample_replicates,sample_groups)
 
   input_formula <- stats::as.formula(paste("scores~sample_groups",sep=""))
 
