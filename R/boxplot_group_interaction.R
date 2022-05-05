@@ -50,14 +50,14 @@ boxplot_group_interaction <- function(seurat_object,
 
     interactions_compare <- id_interactions(interaction_stats)
 
-    extracted_sample_groups <- extract_sample_group_replicates(seurat_object,sample_groups)
+    extracted_sample_groups <- extract_sample_group_replicates(seurat_object,sample_groups,sample_replicates)
 
     replicate_scores_frame <- cell_type_lig_rec_frame(interactions_compare,seurat_object,sample_replicates,sample_groups,metadata_grouping)
     # Replace dots with dashes in column names
     colnames(replicate_scores_frame) <- gsub("\\.","-",colnames(replicate_scores_frame))
 
     interaction_scores_frame <- cell_type_ligand_receptor_score(replicate_scores_frame,interactions_compare,
-      extracted_sample_groups)
+      extracted_sample_groups,sample_replicates,sample_groups)
 
     interaction_scores_frame %>%
       filter(cell_type1=={{cell_type1}}) %>%
