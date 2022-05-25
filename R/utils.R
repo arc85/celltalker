@@ -202,7 +202,7 @@ for (i in 1:length(ligs.from.interact)) {
 	rec.use <- recs.from.interact[i]
 
 	comparisons <- expand.grid(seq(1:number_cell_types),seq(1:number_cell_types))
-	scram.iter <- vector("list",length=number_cell_types)
+	scram.iter <- vector("list",length=scramble_times)
 
 	for (q in 1:scramble_times) {
 
