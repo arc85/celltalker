@@ -57,11 +57,13 @@ circos_plot <- function(ligand_receptor_frame,
     mutate(lig=sapply(strsplit(interaction,split="_"),function(x) x[[1]])) %>%
     mutate(rec=sapply(strsplit(interaction,split="_"),function(x) x[[2]])) %>%
     select(cell_type1,lig) %>%
+    distinct() %>%  
     mutate(type="lig")
   part2 <- ligand_receptor_frame %>%
     mutate(lig=sapply(strsplit(interaction,split="_"),function(x) x[[1]])) %>%
     mutate(rec=sapply(strsplit(interaction,split="_"),function(x) x[[2]])) %>%
     select(cell_type2,rec) %>%
+    distinct() %>%  
     mutate(type="rec")
   colnames(part1) <- colnames(part2) <- c("classes","lig.rec","type")
 
@@ -210,10 +212,24 @@ circos_plot <- function(ligand_receptor_frame,
 
 
   ## Draw links
-  final.construct3 <- final.construct %>%
-    select(classes,lig.rec,ranges,to.class,to.rec) %>%
-    distinct()
+  final.construct3 <- joined %>%
+        select(classes,lig.rec,ranges,to.class,to.rec) %>%
+        distinct()
 
+    split.construct <- final.construct3 %>%
+        split(.$classes)
+
+    final.construct3 <- lapply(split.construct,function(x) {
+        class.length <- length(unique(x$ranges))
+        if (class.length==1) {
+            x[,"ranges"] <- 1.5
+            x
+        } else {
+            x
+            }
+    }) %>%
+        do.call(rbind,.)
+    
   int.types.list <- final.construct3 %>%
     group_split(classes)
 
