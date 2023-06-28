@@ -45,7 +45,9 @@ circos_plot <- function(ligand_receptor_frame,
   ligand_color="blue",
   receptor_color="red",
   cex_outer=0.5,
-  cex_inner=0.4) {
+  cex_inner=0.4,
+  inner_facing="downward",
+  inner_niceFacing=FALSE) {
 
   # Bind variables
   cell_type1 <- lig <- cell_type2 <- rec <- classes <- ranges <-
@@ -179,7 +181,7 @@ circos_plot <- function(ligand_receptor_frame,
         circos.rect(1,0,1+sec.multi.use*a,1,sector.index=int.types.list.multi[[i]]$classes[a],
                     col=ifelse(int.types.list.multi[[i]]$type[a]=="lig",ligand_color,receptor_color),track.index = 2)
         circos.text(1+sec.multi.use*a/2,4,sector.index=int.types.list.multi[[i]]$classes[a],
-                    labels=int.types.list.multi[[i]]$lig.rec[a],track.index = 2,facing="downward",cex=cex_inner)
+                    labels=int.types.list.multi[[i]]$lig.rec[a],track.index = 2,facing=inner_facing,niceFacing=inner_niceFacing,cex=cex_inner)
         })
       } else {
 
@@ -189,7 +191,7 @@ circos_plot <- function(ligand_receptor_frame,
         circos.rect(1+sec.multi.use*(a-1),0,1+sec.multi.use*a,1,sector.index=int.types.list.multi[[i]]$classes[a],
                     col=ifelse(int.types.list.multi[[i]]$type[a]=="lig",ligand_color,receptor_color),track.index = 2)
         circos.text(1+sec.multi.use*a-sec.multi.use/2,4,sector.index=int.types.list.multi[[i]]$classes[a],
-                    labels=int.types.list.multi[[i]]$lig.rec[a],track.index = 2,facing="downward",cex=cex_inner)
+                    labels=int.types.list.multi[[i]]$lig.rec[a],track.index = 2,facing=inner_facing,niceFacing=inner_niceFacing,cex=cex_inner)
         })
       }
 
@@ -204,7 +206,7 @@ circos_plot <- function(ligand_receptor_frame,
       circos.rect(1,0,2,1,sector.index=int.types.list.individ[[i]]$classes[1],
                   col=ifelse(int.types.list.individ[[i]]$type[1]=="lig",ligand_color,receptor_color),track.index = 2)
       circos.text(1.5,4,sector.index=int.types.list.individ[[i]]$classes[1],
-                  labels=int.types.list.individ[[i]]$lig.rec[1],track.index = 2,facing="downward",cex=cex_inner)
+                  labels=int.types.list.individ[[i]]$lig.rec[1],track.index = 2,facing=inner_facing,niceFacing=inner_niceFacing,cex=cex_inner)
 
     }
 
