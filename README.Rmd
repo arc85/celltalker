@@ -13,6 +13,10 @@ knitr::opts_chunk$set(
 )
 ```
 
+# ARCHIVE NOTICE
+
+This celltalker repository is archived and no longer maintained. Please check up the celltalker repository at CilloLaboratory/celltalker for the maintained version. 
+
 # celltalker
 
 The goal of celltalker is to infer putative ligand and receptor interactions from single-cell RNAseq data. This is accomplished by evaluating known cognate ligand/receptor interactions across groups of cells. Interactions are scored by jointly weighting the expression levels of ligands and receptors, and significance is evaluated by comparing to a background distribution of scrambled ligands and receptors.
